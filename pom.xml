@@ -10,6 +10,7 @@
     <module>Rentaler_System</module>
     <module>Rentaler_System_UI</module>
     <module>Rentaler_Device_Monitor</module>
+    <module>Rentaler_Monitor_Api</module>
   </modules>
   <packaging>pom</packaging>
   <properties>
