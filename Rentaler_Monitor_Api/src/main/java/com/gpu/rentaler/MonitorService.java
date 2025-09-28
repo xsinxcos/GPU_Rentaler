@@ -1,5 +1,8 @@
 package com.gpu.rentaler;
 
+import com.gpu.rentaler.entity.ServerInfo;
+
 public interface MonitorService {
-  String getSystemInfo();
+
+    void reportServerInfo(ServerInfo serverInfo);
 }
