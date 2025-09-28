@@ -16,7 +16,7 @@ package com.gpu.rentaler.common;
 
 public interface DomainEventSubscriber<T> {
 
-  void handleEvent(final T aDomainEvent);
+    void handleEvent(final T aDomainEvent);
 
-  Class<T> subscribedToEventType();
+    Class<T> subscribedToEventType();
 }

@@ -9,12 +9,12 @@ import org.testcontainers.containers.MySQLContainer;
 @TestConfiguration(proxyBeanMethods = false)
 public class ContainersConfig {
 
-  @Bean
-  @ServiceConnection
-  @RestartScope
-  MySQLContainer<?> mySQLContainer(){
-    return new MySQLContainer<>("mysql:8.0").withLogConsumer(outputFrame -> {
-    });
-  }
+    @Bean
+    @ServiceConnection
+    @RestartScope
+    MySQLContainer<?> mySQLContainer() {
+        return new MySQLContainer<>("mysql:8.0").withLogConsumer(outputFrame -> {
+        });
+    }
 
 }

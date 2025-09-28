@@ -8,11 +8,11 @@ import com.gpu.rentaler.common.ResultStatus;
  */
 public class StorageException extends BusinessException {
 
-  public StorageException(ResultStatus status) {
-    super(status);
-  }
+    public StorageException(ResultStatus status) {
+        super(status);
+    }
 
-  public StorageException(ResultStatus status, String message) {
-    super(status, message);
-  }
+    public StorageException(ResultStatus status, String message) {
+        super(status, message);
+    }
 }

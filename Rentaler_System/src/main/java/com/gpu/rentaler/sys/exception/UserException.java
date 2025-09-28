@@ -8,11 +8,11 @@ import com.gpu.rentaler.common.ResultStatus;
  */
 public class UserException extends BusinessException {
 
-  public UserException(ResultStatus status) {
-    super(status);
-  }
+    public UserException(ResultStatus status) {
+        super(status);
+    }
 
-  public UserException(ResultStatus status, String message) {
-    super(status, message);
-  }
+    public UserException(ResultStatus status, String message) {
+        super(status, message);
+    }
 }

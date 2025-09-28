@@ -1,12 +1,12 @@
 package com.gpu.rentaler.sys.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.PrePersist;
 import com.gpu.rentaler.common.Constants;
 import com.gpu.rentaler.common.SessionItemHolder;
 import com.gpu.rentaler.common.StringUtils;
 import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.PrePersist;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -18,172 +18,171 @@ import java.util.Map;
 @Entity
 public class StorageConfig extends BaseEntity {
 
-  private String storageId;
+    private String storageId;
 
-  private String name;
+    private String name;
 
-  private Type type;
+    private Type type;
 
-  @Column(name = "is_default")
-  private Boolean isDefault;
+    @Column(name = "is_default")
+    private Boolean isDefault;
 
-  private String accessKey;
+    private String accessKey;
 
-  private String secretKey;
+    private String secretKey;
 
-  private String endpoint;
+    private String endpoint;
 
-  private String bucketName;
+    private String bucketName;
 
-  private String address;
+    private String address;
 
-  private String storagePath;
+    private String storagePath;
 
-  private String createUser;
+    private String createUser;
 
-  private LocalDateTime createTime;
+    private LocalDateTime createTime;
 
-  @PrePersist
-  protected void onCreate() {
-    createTime = LocalDateTime.now();
-    UserinfoDTO userInfo = (UserinfoDTO) SessionItemHolder.getItem(Constants.SESSION_CURRENT_USER);
-    createUser = userInfo.username();
-  }
+    @PrePersist
+    protected void onCreate() {
+        createTime = LocalDateTime.now();
+        UserinfoDTO userInfo = (UserinfoDTO) SessionItemHolder.getItem(Constants.SESSION_CURRENT_USER);
+        createUser = userInfo.username();
+    }
 
-  public enum Type {
-    LOCAL, S3, OSS, OBS
-  }
+    public String getStorageId() {
+        return storageId;
+    }
 
-  public String getStorageId() {
-    return storageId;
-  }
+    public void setStorageId(String storageId) {
+        this.storageId = storageId;
+    }
 
-  public void setStorageId(String storageId) {
-    this.storageId = storageId;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public boolean isDefault() {
+        return isDefault != null && isDefault;
+    }
 
-  public boolean isDefault() {
-    return isDefault != null && isDefault;
-  }
+    public Boolean getIsDefault() {
+        return isDefault;
+    }
 
-  public Boolean getIsDefault() {
-    return isDefault;
-  }
+    public void setIsDefault(Boolean aDefault) {
+        isDefault = aDefault;
+    }
 
-  public void setIsDefault(Boolean aDefault) {
-    isDefault = aDefault;
-  }
+    public Type getType() {
+        return type;
+    }
 
-  public Type getType() {
-    return type;
-  }
+    public void setType(Type type) {
+        this.type = type;
+    }
 
-  public void setType(Type type) {
-    this.type = type;
-  }
+    public String getAccessKey() {
+        return accessKey;
+    }
 
-  public String getAccessKey() {
-    return accessKey;
-  }
+    public void setAccessKey(String accessKey) {
+        this.accessKey = accessKey;
+    }
 
-  public void setAccessKey(String accessKey) {
-    this.accessKey = accessKey;
-  }
+    public String getSecretKey() {
+        return secretKey;
+    }
 
-  public String getSecretKey() {
-    return secretKey;
-  }
+    public void setSecretKey(String secretKey) {
+        this.secretKey = secretKey;
+    }
 
-  public void setSecretKey(String secretKey) {
-    this.secretKey = secretKey;
-  }
+    public String getEndpoint() {
+        return endpoint;
+    }
 
-  public String getEndpoint() {
-    return endpoint;
-  }
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
 
-  public void setEndpoint(String endpoint) {
-    this.endpoint = endpoint;
-  }
+    public String getBucketName() {
+        return bucketName;
+    }
 
-  public String getBucketName() {
-    return bucketName;
-  }
+    public void setBucketName(String bucketName) {
+        this.bucketName = bucketName;
+    }
 
-  public void setBucketName(String bucketName) {
-    this.bucketName = bucketName;
-  }
+    public String getAddress() {
+        return address;
+    }
 
-  public String getAddress() {
-    return address;
-  }
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
-  public void setAddress(String address) {
-    this.address = address;
-  }
+    public String getStoragePath() {
+        return storagePath;
+    }
 
-  public String getStoragePath() {
-    return storagePath;
-  }
+    public void setStoragePath(String storagePath) {
+        this.storagePath = storagePath;
+    }
 
-  public void setStoragePath(String storagePath) {
-    this.storagePath = storagePath;
-  }
+    public String getCreateUser() {
+        return createUser;
+    }
 
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
+    }
 
-  public String getCreateUser() {
-    return createUser;
-  }
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
 
-  public void setCreateUser(String createUser) {
-    this.createUser = createUser;
-  }
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
 
-  public LocalDateTime getCreateTime() {
-    return createTime;
-  }
+    public String getAccessKeyWithEnv() {
+        return renderTemplate(accessKey);
+    }
 
-  public void setCreateTime(LocalDateTime createTime) {
-    this.createTime = createTime;
-  }
+    public String getSecretKeyWithEnv() {
+        return renderTemplate(secretKey);
+    }
 
-  public String getAccessKeyWithEnv() {
-    return renderTemplate(accessKey);
-  }
+    public String getEndpointWithEnv() {
+        return renderTemplate(endpoint);
+    }
 
-  public String getSecretKeyWithEnv() {
-    return renderTemplate(secretKey);
-  }
+    public String getBucketNameWithEnv() {
+        return renderTemplate(bucketName);
+    }
 
-  public String getEndpointWithEnv() {
-    return renderTemplate(endpoint);
-  }
+    public String getAddressWithEnv() {
+        return renderTemplate(address);
+    }
 
-  public String getBucketNameWithEnv() {
-    return renderTemplate(bucketName);
-  }
+    public String getStoragePathWithEnv() {
+        return renderTemplate(storagePath);
+    }
 
-  public String getAddressWithEnv() {
-    return renderTemplate(address);
-  }
+    private String renderTemplate(String template) {
+        Map<Object, Object> attributes = new HashMap<>();
+        attributes.putAll(System.getenv());
+        attributes.putAll(System.getProperties());
+        return StringUtils.simpleRenderTemplate(template, attributes);
+    }
 
-  public String getStoragePathWithEnv() {
-    return renderTemplate(storagePath);
-  }
-
-  private String renderTemplate(String template) {
-    Map<Object, Object> attributes = new HashMap<>();
-    attributes.putAll(System.getenv());
-    attributes.putAll(System.getProperties());
-    return StringUtils.simpleRenderTemplate(template, attributes);
-  }
+    public enum Type {
+        LOCAL, S3, OSS, OBS
+    }
 
 }

@@ -34,11 +34,11 @@ API 的标准方法（也称为“REST 方法”）包括 List、Get、Create、
 
 | 标准方法   | HTTP映射                                        | HTTP请求正文 | hTTP响应正文 |
 |--------|-----------------------------------------------|----------|----------|
-| List   | `GET <collection URL>`                         | 无        | 资源*列表    |
-| Get    | `GET <collection URL>/<collection_id>`          | 无        | 资源*      |
-| Create | `POST <collection URL>`                         | 资源       | 资源*      |
+| List   | `GET <collection URL>`                        | 无        | 资源*列表    |
+| Get    | `GET <collection URL>/<collection_id>`        | 无        | 资源*      |
+| Create | `POST <collection URL>`                       | 资源       | 资源*      |
 | Update | `PUT or PATCH <resource URL>/<collection_id>` | 资源       | 资源*      |
-| Delete | `DELETE <resource URL>/<collection_id>`         | 不适用      |          |
+| Delete | `DELETE <resource URL>/<collection_id>`       | 不适用      |          |
 
 ### 自定义方法
 
@@ -59,7 +59,7 @@ https://service.name/v1/some/resource/name:customVerb
 | BatchGET | :batchGet | GET    | 批量获取多个资源                      |
 | Move     | :move     | POST   | 将资源从一个父级移动到另一个父级              |
 | Search   | :search   | GET    | List 的替代方法，用于获取不符合 List 语义的数据 |
-| Undelete | :undelete | POST   | 恢复之前删除的资源 |
+| Undelete | :undelete | POST   | 恢复之前删除的资源                     |
 
 注意：上面的情况指的是API名称；HTTP/JSON URI 后缀使用 :lowerCamelCase。
 
@@ -130,14 +130,14 @@ curl -X 'GET' \
 
 **说明**
 
-| 属性      | 类型     | 是否必须 | 说明   |
-|---------|--------|------|------|
+| 属性      | 类型     | 是否必须 | 说明    |
+|---------|--------|------|-------|
 | code    | number | 是    | 业务状态码 |
-| message | string | 是    | 业务消息 |
-| data    | any    | 否    | 异常数据 |
-| errors  | array  | 否    | 错误列表 |
+| message | string | 是    | 业务消息  |
+| data    | any    | 否    | 异常数据  |
+| errors  | array  | 否    | 错误列表  |
 
- **业务状态码**
+**业务状态码**
 
 | 状态码  | 说明      |
 |------|---------|
@@ -149,6 +149,7 @@ curl -X 'GET' \
 | -1   | 服务器内部错误 |
 
 对于分页接口,可能要返回总条数, 结构如下：
+
 ```json lines
 {
   "list": [

@@ -1,9 +1,9 @@
 package com.gpu.rentaler.sys.model;
 
-import jakarta.persistence.*;
 import com.gpu.rentaler.common.Constants;
 import com.gpu.rentaler.common.SessionItemHolder;
 import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
+import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
@@ -14,93 +14,93 @@ import java.time.LocalDateTime;
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"key"})})
 public class StorageFile extends BaseEntity {
 
-  /**
-   * 文件的唯一索引
-   */
-  @Column(name = "`key`")
-  private String key;
+    /**
+     * 文件的唯一索引
+     */
+    @Column(name = "`key`")
+    private String key;
 
-  /**
-   * 文件名
-   */
-  private String name;
+    /**
+     * 文件名
+     */
+    private String name;
 
-  /**
-   * 文件类型
-   */
-  private String type;
+    /**
+     * 文件类型
+     */
+    private String type;
 
-  /**
-   * 文件大小
-   */
-  private Long size;
+    /**
+     * 文件大小
+     */
+    private Long size;
 
-  private String createUser;
+    private String createUser;
 
-  private LocalDateTime createTime;
+    private LocalDateTime createTime;
 
-  private String storageId;
+    private String storageId;
 
-  @PrePersist
-  protected void onCreate() {
-    createTime = LocalDateTime.now();
-    UserinfoDTO userInfo = (UserinfoDTO) SessionItemHolder.getItem(Constants.SESSION_CURRENT_USER);
-    createUser = userInfo.username();
-  }
+    @PrePersist
+    protected void onCreate() {
+        createTime = LocalDateTime.now();
+        UserinfoDTO userInfo = (UserinfoDTO) SessionItemHolder.getItem(Constants.SESSION_CURRENT_USER);
+        createUser = userInfo.username();
+    }
 
-  public String getKey() {
-    return key;
-  }
+    public String getKey() {
+        return key;
+    }
 
-  public void setKey(String key) {
-    this.key = key;
-  }
+    public void setKey(String key) {
+        this.key = key;
+    }
 
-  public String getName() {
-    return name;
-  }
+    public String getName() {
+        return name;
+    }
 
-  public void setName(String name) {
-    this.name = name;
-  }
+    public void setName(String name) {
+        this.name = name;
+    }
 
-  public String getType() {
-    return type;
-  }
+    public String getType() {
+        return type;
+    }
 
-  public void setType(String type) {
-    this.type = type;
-  }
+    public void setType(String type) {
+        this.type = type;
+    }
 
-  public Long getSize() {
-    return size;
-  }
+    public Long getSize() {
+        return size;
+    }
 
-  public void setSize(Long size) {
-    this.size = size;
-  }
+    public void setSize(Long size) {
+        this.size = size;
+    }
 
-  public String getCreateUser() {
-    return createUser;
-  }
+    public String getCreateUser() {
+        return createUser;
+    }
 
-  public void setCreateUser(String createUser) {
-    this.createUser = createUser;
-  }
+    public void setCreateUser(String createUser) {
+        this.createUser = createUser;
+    }
 
-  public LocalDateTime getCreateTime() {
-    return createTime;
-  }
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
 
-  public void setCreateTime(LocalDateTime createTime) {
-    this.createTime = createTime;
-  }
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
+    }
 
-  public String getStorageId() {
-    return storageId;
-  }
+    public String getStorageId() {
+        return storageId;
+    }
 
-  public void setStorageId(String storageId) {
-    this.storageId = storageId;
-  }
+    public void setStorageId(String storageId) {
+        this.storageId = storageId;
+    }
 }

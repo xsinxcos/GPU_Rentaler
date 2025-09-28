@@ -6,26 +6,26 @@ import Components from 'unplugin-vue-components/vite';
 import {ElementPlusResolver} from 'unplugin-vue-components/resolvers';
 
 export default defineConfig({
-	base: './',
-	plugins: [
-		vue(),
-		VueSetupExtend(),
-		AutoImport({
-			resolvers: [ElementPlusResolver()]
-		}),
-		Components({
-			resolvers: [ElementPlusResolver()]
-		})
-	],
-	server: {
-		host: '0.0.0.0',
-		proxy: {
-			'/admin3': {
-				target: `http://localhost:8080`,
-			},
-		},
-	},
-	optimizeDeps: {
-		include: ['schart.js']
-	}
+    base: './',
+    plugins: [
+        vue(),
+        VueSetupExtend(),
+        AutoImport({
+            resolvers: [ElementPlusResolver()]
+        }),
+        Components({
+            resolvers: [ElementPlusResolver()]
+        })
+    ],
+    server: {
+        host: '0.0.0.0',
+        proxy: {
+            '/admin3': {
+                target: `http://localhost:8080`,
+            },
+        },
+    },
+    optimizeDeps: {
+        include: ['schart.js']
+    }
 });

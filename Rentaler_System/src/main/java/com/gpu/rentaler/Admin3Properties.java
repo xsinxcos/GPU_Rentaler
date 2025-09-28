@@ -12,35 +12,35 @@ import java.util.Map;
 @ConfigurationProperties("admin3")
 public class Admin3Properties {
 
-  private Map<String, Event> events = new HashMap<>();
+    private Map<String, Event> events = new HashMap<>();
 
-  public Map<String, Event> getEvents() {
-    return events;
-  }
-
-  public void setEvents(Map<String, Event> events) {
-    this.events = events;
-  }
-
-  public static class Event {
-    private String text;
-    private String logTemplate;
-
-    public String getText() {
-      return text;
+    public Map<String, Event> getEvents() {
+        return events;
     }
 
-    public void setText(String text) {
-      this.text = text;
+    public void setEvents(Map<String, Event> events) {
+        this.events = events;
     }
 
-    public String getLogTemplate() {
-      return logTemplate;
-    }
+    public static class Event {
+        private String text;
+        private String logTemplate;
 
-    public void setLogTemplate(String logTemplate) {
-      this.logTemplate = logTemplate;
+        public String getText() {
+            return text;
+        }
+
+        public void setText(String text) {
+            this.text = text;
+        }
+
+        public String getLogTemplate() {
+            return logTemplate;
+        }
+
+        public void setLogTemplate(String logTemplate) {
+            this.logTemplate = logTemplate;
+        }
     }
-  }
 
 }

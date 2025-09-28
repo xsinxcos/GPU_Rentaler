@@ -7,6 +7,6 @@ package com.gpu.rentaler.common;
  */
 public interface EventStore {
 
-  void append(DomainEvent aDomainEvent);
+    void append(DomainEvent aDomainEvent);
 
 }

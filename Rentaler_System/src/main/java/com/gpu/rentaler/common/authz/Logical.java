@@ -7,5 +7,5 @@ package com.gpu.rentaler.common.authz;
  * @author cjbi
  */
 public enum Logical {
-  AND, OR
+    AND, OR
 }

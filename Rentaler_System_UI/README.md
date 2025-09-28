@@ -28,7 +28,7 @@
 
 [<img src="https://static.bestqa.net/logo/bestqa_haowen.png" width="220" height="100">](https://www.bestqa.net/home/index.html)
 
-专业问卷服务，一对一客服，按需定制 
+专业问卷服务，一对一客服，按需定制
 
 ## 支持作者
 
@@ -38,7 +38,8 @@
 
 ## 前言
 
-该方案作为一套多功能的后台框架模板，适用于绝大部分的后台管理系统开发。基于 Vue3 + pinia + typescript，引用 Element Plus 组件库，方便开发。实现逻辑简单，适合外包项目，快速交付。
+该方案作为一套多功能的后台框架模板，适用于绝大部分的后台管理系统开发。基于 Vue3 + pinia + typescript，引用 Element Plus
+组件库，方便开发。实现逻辑简单，适合外包项目，快速交付。
 
 ## 功能
 
@@ -58,8 +59,8 @@
 -   [x] 三级菜单
 -   [x] 自定义图标
 
-
 ## 安装步骤
+
 > 因为使用vite3，node版本需要 14.18+
 
 ```
@@ -78,7 +79,7 @@ npm run build
 
 ### vue-schart
 
-vue.js 封装 sChart.js 的图表组件。访问地址：[vue-schart](https://github.com/lin-xin/vue-schart#/) 
+vue.js 封装 sChart.js 的图表组件。访问地址：[vue-schart](https://github.com/lin-xin/vue-schart#/)
 
 <p><a href="https://www.npmjs.com/package/vue-schart"><img src="https://img.shields.io/npm/dm/vue-schart.svg" alt="Downloads"></a></p>
 

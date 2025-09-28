@@ -1,7 +1,7 @@
 package com.gpu.rentaler.sys.service;
 
-import org.springframework.stereotype.Service;
 import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
+import org.springframework.stereotype.Service;
 
 /**
  * @author cjbi
@@ -9,14 +9,14 @@ import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
 @Service
 public interface SessionService {
 
-  UserinfoDTO login(String username, String password);
+    UserinfoDTO login(String username, String password);
 
-  void logout(String token);
+    void logout(String token);
 
-  boolean isLogin(String token);
+    boolean isLogin(String token);
 
-  UserinfoDTO getLoginUserInfo(String token);
+    UserinfoDTO getLoginUserInfo(String token);
 
-  void refresh();
+    void refresh();
 
 }

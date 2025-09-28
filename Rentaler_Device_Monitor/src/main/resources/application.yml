@@ -1,15 +1,15 @@
 server:
-  port: 8072
+    port: 8072
 
 dubbo:
-  application:
-    name: piper-ai-worker
-  protocol:
-    name: dubbo
-    port: -1
-    host: 172.25.96.1
-  registry:
-    address: zookeeper://127.0.0.1:2181
-    file: dubbo-registry-${server.port}.cache
-  scan:
-    base-packages: com.zhuo.piper.core.worker.impl
+    application:
+        name: piper-ai-worker
+    protocol:
+        name: dubbo
+        port: -1
+        host: 172.25.96.1
+    registry:
+        address: zookeeper://127.0.0.1:2181
+        file: dubbo-registry-${server.port}.cache
+    scan:
+        base-packages: com.zhuo.piper.core.worker.impl

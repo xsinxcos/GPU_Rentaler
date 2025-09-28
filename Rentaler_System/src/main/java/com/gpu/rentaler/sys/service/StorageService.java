@@ -1,9 +1,9 @@
 package com.gpu.rentaler.sys.service;
 
-import org.springframework.core.io.Resource;
 import com.gpu.rentaler.sys.model.StorageConfig;
 import com.gpu.rentaler.sys.model.StorageFile;
 import com.gpu.rentaler.sys.service.dto.StorageFileDTO;
+import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
 import java.util.List;
@@ -13,23 +13,23 @@ import java.util.List;
  */
 public interface StorageService {
 
-  List<StorageConfig> findConfigList();
+    List<StorageConfig> findConfigList();
 
-  StorageConfig getConfig(Long id);
+    StorageConfig getConfig(Long id);
 
-  StorageConfig createConfig(String name, StorageConfig.Type type, String endpoint, String accessKey, String secretKey, String bucketName, String address, String storagePath);
+    StorageConfig createConfig(String name, StorageConfig.Type type, String endpoint, String accessKey, String secretKey, String bucketName, String address, String storagePath);
 
-  StorageConfig updateConfig(Long id, String name, StorageConfig.Type type, String endpoint, String bucketName, String accessKey, String secretKey, String address, String storagePath);
+    StorageConfig updateConfig(Long id, String name, StorageConfig.Type type, String endpoint, String bucketName, String accessKey, String secretKey, String address, String storagePath);
 
-  void deleteConfig(StorageConfig storageConfig);
+    void deleteConfig(StorageConfig storageConfig);
 
-  void markAsDefault(StorageConfig storageConfig);
+    void markAsDefault(StorageConfig storageConfig);
 
-  StorageFileDTO store(String storageId, InputStream inputStream, long contentLength, String contentType, String filename);
+    StorageFileDTO store(String storageId, InputStream inputStream, long contentLength, String contentType, String filename);
 
-  void delete(String key);
+    void delete(String key);
 
-  StorageFile getByKey(String key);
+    StorageFile getByKey(String key);
 
-  Resource loadAsResource(String key);
+    Resource loadAsResource(String key);
 }

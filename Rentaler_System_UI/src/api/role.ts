@@ -8,7 +8,12 @@ export function getRoleList() {
     });
 };
 
-export function getRoleUserList(roleId: number, data: { page: number; size: number; username?: string, state?: string }) {
+export function getRoleUserList(roleId: number, data: {
+    page: number;
+    size: number;
+    username?: string,
+    state?: string
+}) {
     return request({
         url: `${BASE_URI}/roles/${roleId}/users`,
         method: 'get',

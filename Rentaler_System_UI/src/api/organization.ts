@@ -9,7 +9,13 @@ export function getOrganizationTree(params: { parentId: number }) {
     });
 }
 
-export function getOrganizationUserList(organizationId: number, data: { page: number; size: number; username?: string, state?: string, roleId?: number }) {
+export function getOrganizationUserList(organizationId: number, data: {
+    page: number;
+    size: number;
+    username?: string,
+    state?: string,
+    roleId?: number
+}) {
     return request({
         url: `${BASE_URI}/organizations/${organizationId}/users`,
         method: 'get',

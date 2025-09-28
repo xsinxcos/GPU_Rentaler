@@ -23,63 +23,63 @@ import java.util.Objects;
 @MappedSuperclass
 public abstract class BaseEntity {
 
-  /**
-   * This identity field has the wrapper class type Long so that an entity which
-   * has not been saved is recognizable by a null identity.
-   */
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+    /**
+     * This identity field has the wrapper class type Long so that an entity which
+     * has not been saved is recognizable by a null identity.
+     */
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  public void setId(Long id) {
-    this.id = id;
-  }
-
-  /**
-   * Returns the identity of this entity object.
-   *
-   * @return the identity of this entity object
-   */
-  public Long getId() {
-    return id;
-  }
-
-  @Override
-  public boolean equals(final Object object) {
-    if (!(object instanceof BaseEntity)) {
-      return false;
+    /**
+     * Returns the identity of this entity object.
+     *
+     * @return the identity of this entity object
+     */
+    public Long getId() {
+        return id;
     }
-    if (!getClass().equals(object.getClass())) {
-      return false;
+
+    public void setId(Long id) {
+        this.id = id;
     }
-    final BaseEntity that = (BaseEntity) object;
-    _checkIdentity(this);
-    _checkIdentity(that);
-    return this.id.equals(that.getId());
-  }
 
-  /**
-   * Checks the passed entity, if it has an identity. It gets an identity only by
-   * saving.
-   *
-   * @param entity the entity to be checked
-   * @throws IllegalStateException the passed entity does not have the identity
-   *                               attribute set.
-   */
-  private void _checkIdentity(final BaseEntity entity) {
-    if (entity.getId() == null) {
-      throw new IllegalStateException("Comparison identity missing in entity: " + entity);
+    @Override
+    public boolean equals(final Object object) {
+        if (!(object instanceof BaseEntity)) {
+            return false;
+        }
+        if (!getClass().equals(object.getClass())) {
+            return false;
+        }
+        final BaseEntity that = (BaseEntity) object;
+        _checkIdentity(this);
+        _checkIdentity(that);
+        return this.id.equals(that.getId());
     }
-  }
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(this.getId());
-  }
+    /**
+     * Checks the passed entity, if it has an identity. It gets an identity only by
+     * saving.
+     *
+     * @param entity the entity to be checked
+     * @throws IllegalStateException the passed entity does not have the identity
+     *                               attribute set.
+     */
+    private void _checkIdentity(final BaseEntity entity) {
+        if (entity.getId() == null) {
+            throw new IllegalStateException("Comparison identity missing in entity: " + entity);
+        }
+    }
 
-  @Override
-  public String toString() {
-    return this.getClass().getSimpleName() + "<" + getId() + ">";
-  }
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getId());
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "<" + getId() + ">";
+    }
 
 }

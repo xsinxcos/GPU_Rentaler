@@ -1,11 +1,11 @@
 package com.gpu.rentaler.controller;
 
+import com.gpu.rentaler.Admin3Properties;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import com.gpu.rentaler.Admin3Properties;
 
 import java.util.List;
 
@@ -19,22 +19,22 @@ import java.util.List;
 @RequestMapping("/common")
 public class CommonController {
 
-  private final Admin3Properties admin3Properties;
+    private final Admin3Properties admin3Properties;
 
-  public CommonController(Admin3Properties admin3Properties) {
-    this.admin3Properties = admin3Properties;
-  }
+    public CommonController(Admin3Properties admin3Properties) {
+        this.admin3Properties = admin3Properties;
+    }
 
-  @GetMapping("/event-types")
-  public ResponseEntity<List<TypeInfo>> findEventTypes() {
-    List<TypeInfo> typeInfos = admin3Properties.getEvents().entrySet().stream()
-      .map(entry -> new TypeInfo(entry.getValue().getText(), entry.getKey()))
-      .toList();
-    return ResponseEntity.ok(typeInfos);
-  }
+    @GetMapping("/event-types")
+    public ResponseEntity<List<TypeInfo>> findEventTypes() {
+        List<TypeInfo> typeInfos = admin3Properties.getEvents().entrySet().stream()
+            .map(entry -> new TypeInfo(entry.getValue().getText(), entry.getKey()))
+            .toList();
+        return ResponseEntity.ok(typeInfos);
+    }
 
-  record TypeInfo(String label, String value) {
-  }
+    record TypeInfo(String label, String value) {
+    }
 
 
 }
