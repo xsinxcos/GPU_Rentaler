@@ -16,11 +16,13 @@ public class ServerHeartBeatRecord {
         serverHeartBeatMap.put(serverId, System.currentTimeMillis());
     }
 
-    public synchronized List<Long> getDeadServers() {
+    public synchronized List<Long> getDeadServersAndRemove() {
         Long currentTime = System.currentTimeMillis();
-        return serverHeartBeatMap.entrySet().stream()
+        List<Long> dead = serverHeartBeatMap.entrySet().stream()
             .filter(entry -> currentTime - entry.getValue() > heartbeatTimeout)
             .map(Map.Entry::getKey)
             .toList();
+        dead.forEach(serverHeartBeatMap::remove);
+        return dead;
     }
 }

@@ -1,5 +1,6 @@
 package com.gpu.rentaler.sys.service;
 
+import com.gpu.rentaler.sys.constant.DeviceStatus;
 import com.gpu.rentaler.sys.model.Server;
 import com.gpu.rentaler.sys.repository.ServerRepository;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class ServerService {
         newServer.setRamTotalGb(ramTotalGb);
         newServer.setStorageTotalGb(storageTotalGb);
         newServer.setGpuSlots(gpuSlots);
+        newServer.setStatus(DeviceStatus.ONLINE);
         return serverRepository.save(newServer);
     }
 
@@ -42,6 +44,7 @@ public class ServerService {
             existingServer.setRamTotalGb(ramTotalGb);
             existingServer.setStorageTotalGb(storageTotalGb);
             existingServer.setGpuSlots(gpuSlots);
+            existingServer.setStatus(DeviceStatus.ONLINE);
             serverRepository.save(existingServer);
         } else {
             // Handle the case where the server does not exist
@@ -59,5 +62,9 @@ public class ServerService {
             // Handle the case where the server does not exist
             throw new RuntimeException("Server with ID " + serverId + " not found.");
         }
+    }
+
+    public Server getById(Long serverId) {
+        return serverRepository.findById(serverId).orElseThrow(() -> new RuntimeException("Server with ID " + serverId + " not found."));
     }
 }

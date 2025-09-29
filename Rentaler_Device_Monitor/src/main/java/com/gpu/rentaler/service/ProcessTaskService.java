@@ -3,6 +3,8 @@ package com.gpu.rentaler.service;
 import com.gpu.rentaler.MonitorService;
 import com.gpu.rentaler.entity.ProcessInfo;
 import jakarta.annotation.Resource;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -14,6 +16,7 @@ public class ProcessTaskService {
 
     // 定义时间格式化器
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final Logger log = LogManager.getLogger(ProcessTaskService.class);
 
     @Resource
     private GPUFactory gpuFactory;
@@ -30,9 +33,12 @@ public class ProcessTaskService {
      */
     @Scheduled(fixedRate = 5000) // 5秒
     public void executeTask() {
-        // 这里可以添加你的业务方法调用
-        List<ProcessInfo> allGPUActivityInfo = gpuFactory.getAllGPUActivityInfo();
-        Long serverId = serverIDManager.getServerId();
-        monitorService.reportProcessMsg(serverId ,allGPUActivityInfo);
+        try {
+            List<ProcessInfo> allGPUActivityInfo = gpuFactory.getAllGPUActivityInfo();
+            Long serverId = serverIDManager.getServerId();
+            monitorService.reportProcessMsg(serverId ,allGPUActivityInfo);
+        }catch (Exception e){
+            log.info("{} - Error in executeTask: {}", LocalDateTime.now().format(formatter), e.getMessage());
+        }
     }
 }

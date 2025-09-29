@@ -1,4 +1,4 @@
-package com.gpu.rentaler.sys.monitor;
+package com.gpu.rentaler.sys.constant;
 
 public interface DeviceStatus {
     String ONLINE = "ONLINE";

@@ -1,5 +1,6 @@
 package com.gpu.rentaler.sys.monitor;
 
+import com.gpu.rentaler.sys.constant.DeviceStatus;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
 import com.gpu.rentaler.sys.service.ServerService;
 import jakarta.annotation.Resource;
@@ -23,7 +24,7 @@ public class OfflineCheckService {
 
     @Scheduled(fixedRate = 5000) // 5秒
     public void executeTask() {
-        List<Long> deadServers = serverHeartBeatRecord.getDeadServers();
+        List<Long> deadServers = serverHeartBeatRecord.getDeadServersAndRemove();
         for (Long deadServer : deadServers) {
             serverService.changeStatus(deadServer, DeviceStatus.OFFLINE);
             gpuDeviceService.changeStatusByServerId(deadServer, DeviceStatus.OFFLINE);

@@ -1,6 +1,7 @@
 package com.gpu.rentaler.sys.service;
 
 import com.gpu.rentaler.entity.GPUDeviceInfo;
+import com.gpu.rentaler.sys.constant.DeviceStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.repository.GPUDeviceRepository;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ public class GPUDeviceService {
             existingDevice.setBrand(updateDevice.getBrand());
             existingDevice.setMemoryType(updateDevice.getMemoryType());
             existingDevice.setModel(updateDevice.getModel());
-            existingDevice.setStatus(updateDevice.getStatus());
+            existingDevice.setStatus(DeviceStatus.ONLINE);
             gpuDeviceRepository.save(existingDevice);
         }
 
@@ -57,7 +58,7 @@ public class GPUDeviceService {
             newDevice.setBrand(saveDevice.getBrand());
             newDevice.setMemoryType(saveDevice.getMemoryType());
             newDevice.setModel(saveDevice.getModel());
-            newDevice.setStatus(saveDevice.getStatus());
+            newDevice.setStatus(DeviceStatus.ONLINE);
             gpuDeviceRepository.save(newDevice);
         }
     }
