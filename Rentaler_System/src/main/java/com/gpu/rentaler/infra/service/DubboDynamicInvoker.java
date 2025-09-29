@@ -19,13 +19,13 @@ public class DubboDynamicInvoker {
      * @param <T>     泛型
      * @return 服务代理对象
      */
-    public <T> T getService(Class<T> clazz, String version, String ip, int port) {
+    public <T> T getService(Class<T> clazz, String version, String ip, int port  ,int timeout) {
         ReferenceConfig<T> reference = new ReferenceConfig<>();
         reference.setApplication(application);
         reference.setInterface(clazz);
         reference.setVersion(version);
         reference.setUrl("dubbo://" + ip + ":" + port); // 动态 IP 直连
-        reference.setTimeout(5000);
+        reference.setTimeout(timeout);
         return reference.get();
     }
 }

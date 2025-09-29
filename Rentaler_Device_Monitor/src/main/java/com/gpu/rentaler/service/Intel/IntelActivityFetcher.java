@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
-public class IntelActivityFetcher  implements GPUActivityFetcher {
+public class IntelActivityFetcher implements GPUActivityFetcher {
     @Override
     public List<ProcessInfo> getGpuProcessList() {
         // 不支持

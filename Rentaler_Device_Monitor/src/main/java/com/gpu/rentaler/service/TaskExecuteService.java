@@ -23,15 +23,15 @@ public class TaskExecuteService implements TaskAssignService {
     @Override
     public DockerCreateResInfo createDockerContainer(String gpuType) {
         DockerComposeExecutor executor = null;
-        if(GPUType.NVIDIA.equals(gpuType)){
+        if (GPUType.NVIDIA.equals(gpuType)) {
             executor = new DockerComposeExecutor(DockerFileLocation.NVIDIA_DOCKER);
-        }else if(GPUType.AMD.equals(gpuType)){
+        } else if (GPUType.AMD.equals(gpuType)) {
             executor = new DockerComposeExecutor(DockerFileLocation.AMD_DOCKER);
         }
         DockerCreateResInfo createResInfo = new DockerCreateResInfo();
         Optional.ofNullable(executor).ifPresent(item -> {
             String secret = UUID.randomUUID().toString();
-            item.addEnvironmentVariable("SSH_USER" , "root");
+            item.addEnvironmentVariable("SSH_USER", "root");
             item.addEnvironmentVariable("SSH_PASSWORD", secret);
             try {
                 item.up();

@@ -35,7 +35,7 @@ public class DeviceTaskService {
             String ip = server.getIpAddress();
             int port = 20880;
 
-            TaskAssignService myService = dubboDynamicInvoker.getService(TaskAssignService.class, "1.0.0", ip, port);
+            TaskAssignService myService = dubboDynamicInvoker.getService(TaskAssignService.class, "1.0.0", ip, port ,30000);
             if (GPUType.NVIDIA.equalsIgnoreCase(brand)) {
                 DockerCreateResInfo dockerContainer = myService.createDockerContainer(GPUType.NVIDIA);
                 System.out.println("调用结果: " + JsonUtils.stringify(dockerContainer));

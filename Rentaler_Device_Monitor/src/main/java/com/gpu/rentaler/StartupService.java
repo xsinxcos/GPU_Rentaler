@@ -18,7 +18,7 @@ public class StartupService implements CommandLineRunner {
     // 原子布尔值确保线程安全的执行标记
     private static final AtomicBoolean HAS_EXECUTED = new AtomicBoolean(false);
 
-    @DubboReference
+    @DubboReference(version = "1.0.0")
     MonitorService monitorService;  // 注意：确保此类已正确定义
 
     @Resource
