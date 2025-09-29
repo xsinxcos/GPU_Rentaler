@@ -48,4 +48,16 @@ public class ServerService {
             throw new RuntimeException("Server with ID " + serverId + " not found.");
         }
     }
+
+    public void changeStatus(Long serverId, String status) {
+        Optional<Server> optionalServer = serverRepository.findById(serverId);
+        if (optionalServer.isPresent()) {
+            Server existingServer = optionalServer.get();
+            existingServer.setStatus(status);
+            serverRepository.save(existingServer);
+        } else {
+            // Handle the case where the server does not exist
+            throw new RuntimeException("Server with ID " + serverId + " not found.");
+        }
+    }
 }

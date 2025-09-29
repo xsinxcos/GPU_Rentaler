@@ -25,10 +25,10 @@ public class ProcessTaskService {
     private ServerIDManager serverIDManager;
 
     /**
-     * 每2秒执行一次的定时任务
+     * 每5秒执行一次的定时任务
      * fixedRate: 以固定速率执行，即从上一次任务开始时间算起，间隔指定时间后再次执行
      */
-    @Scheduled(fixedRate = 10000) // 2000毫秒 = 2秒
+    @Scheduled(fixedRate = 5000) // 5秒
     public void executeTask() {
         // 这里可以添加你的业务方法调用
         List<ProcessInfo> allGPUActivityInfo = gpuFactory.getAllGPUActivityInfo();

@@ -61,4 +61,12 @@ public class GPUDeviceService {
             gpuDeviceRepository.save(newDevice);
         }
     }
+
+    public void changeStatusByServerId(Long serverId, String status) {
+        List<GPUDevice> devices = gpuDeviceRepository.findAllByServerId(serverId);
+        for (GPUDevice device : devices) {
+            device.setStatus(status);
+            gpuDeviceRepository.save(device);
+        }
+    }
 }

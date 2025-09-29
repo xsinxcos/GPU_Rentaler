@@ -1,0 +1,26 @@
+package com.gpu.rentaler.sys.monitor;
+
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+@Component
+public class ServerHeartBeatRecord {
+    private final Map<Long, Long> serverHeartBeatMap = new ConcurrentHashMap<>(); // 服务器ID到最后心跳时间的映射
+
+    private final Long heartbeatTimeout = 30000L; // 心跳超时时间，单位：毫秒（例如：60秒）
+
+    public synchronized void recordHeartBeat(Long serverId) {
+        serverHeartBeatMap.put(serverId, System.currentTimeMillis());
+    }
+
+    public synchronized List<Long> getDeadServers() {
+        Long currentTime = System.currentTimeMillis();
+        return serverHeartBeatMap.entrySet().stream()
+            .filter(entry -> currentTime - entry.getValue() > heartbeatTimeout)
+            .map(Map.Entry::getKey)
+            .toList();
+    }
+}

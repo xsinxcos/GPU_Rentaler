@@ -12,6 +12,7 @@ import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class GPUMonitorService implements MonitorService {
     private GPUDeviceService gpuDeviceService;
 
     @Resource
-    private Executor executor;
+    private ServerHeartBeatRecord serverHeartBeatRecord;
 
     @Override
     public Long reportServerInfo(ServerInfo serverInfo) {
@@ -49,7 +50,7 @@ public class GPUMonitorService implements MonitorService {
 
     @Override
     public void updateServerInfo(ServerInfo serverInfo) {
-        executor.execute(() -> {
+        asyncExecute(() -> {
             serverService.updateServerInfo(
                 serverInfo.getServerId(),
                 serverInfo.getHostname(),
@@ -67,9 +68,15 @@ public class GPUMonitorService implements MonitorService {
 
     @Override
     public void reportProcessMsg(Long serverId, List<ProcessInfo> processInfos) {
-        executor.execute(() -> {
+        asyncExecute(() -> {
+            serverHeartBeatRecord.recordHeartBeat(serverId);
             String stringify = JsonUtils.stringify(processInfos);
             log.info(stringify);
         });
+    }
+
+    @Async("monitorTaskExecutor")
+    protected void asyncExecute(Runnable task) {
+        task.run();
     }
 }

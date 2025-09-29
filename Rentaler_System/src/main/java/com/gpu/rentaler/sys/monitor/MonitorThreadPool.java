@@ -10,8 +10,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Configuration
 public class MonitorThreadPool {
 
-    @Bean("monitorThreadPool")
-    public Executor taskExecutor() {
+    @Bean("monitorTaskExecutor")
+    public Executor monitorTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
         // 核心线程数：线程池维护的最小线程数量
