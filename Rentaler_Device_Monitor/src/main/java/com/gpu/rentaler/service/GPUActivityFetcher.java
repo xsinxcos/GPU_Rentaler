@@ -1,0 +1,11 @@
+package com.gpu.rentaler.service;
+
+import com.gpu.rentaler.entity.ProcessInfo;
+
+import java.util.List;
+
+public interface GPUActivityFetcher {
+
+    List<ProcessInfo> getGpuProcessList();
+
+}

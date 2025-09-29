@@ -33,7 +33,7 @@ public class ServerInfoCollector {
     private static final boolean IS_MAC = OS_NAME.contains("mac");
 
     @Resource
-    private UUIDManager uuidManager;
+    private ServerIDManager serverIDManager;
 
     /**
      * 获取完整的服务器信息
@@ -43,7 +43,7 @@ public class ServerInfoCollector {
 
         try {
             // 获取主机ID
-            serverInfo.setServerId(uuidManager.getApplicationUUID());
+            serverInfo.setServerId(serverIDManager.getServerId());
 
             // 获取主机名
             serverInfo.setHostname(getHostname());
@@ -91,7 +91,7 @@ public class ServerInfoCollector {
 
         try {
             // 方法2: 使用系统命令
-            String command = IS_WINDOWS ? "hostname" : "hostname";
+            String command = "hostname";
             String result = executeCommand(command);
             if (result != null && !result.trim().isEmpty()) {
                 return result.trim().split("\n")[0];
@@ -216,6 +216,7 @@ public class ServerInfoCollector {
 
     /**
      * 获取CPU信息
+     *
      * @return 数组，[0]为CPU型号，[1]为核心数
      */
     private String[] getCPUInfo() {
@@ -487,8 +488,8 @@ public class ServerInfoCollector {
                     line = line.trim();
                     if (!line.isEmpty() && !line.equals("Name") &&
                         (line.contains("NVIDIA") || line.contains("AMD") ||
-                         line.contains("Intel") || line.contains("Radeon") ||
-                         line.contains("GeForce") || line.contains("Quadro"))) {
+                            line.contains("Intel") || line.contains("Radeon") ||
+                            line.contains("GeForce") || line.contains("Quadro"))) {
                         count++;
                     }
                 }

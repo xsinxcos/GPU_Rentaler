@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public class ServerInfo implements Serializable {
-    private String serverId;
+    private Long serverId;
 
     private String hostname;
 
@@ -26,7 +26,7 @@ public class ServerInfo implements Serializable {
 
     }
 
-    public ServerInfo(String serverId, String hostname, String ipAddress, String cpuModel, int cpuCores, int ramTotalGb, int storageTotalGb, int gpuSlots, List<GPUDeviceInfo> gpuDeviceInfos) {
+    public ServerInfo(Long serverId, String hostname, String ipAddress, String cpuModel, int cpuCores, int ramTotalGb, int storageTotalGb, int gpuSlots, List<GPUDeviceInfo> gpuDeviceInfos) {
         this.serverId = serverId;
         this.hostname = hostname;
         this.ipAddress = ipAddress;
@@ -102,11 +102,11 @@ public class ServerInfo implements Serializable {
         this.gpuDeviceInfos = gpuDeviceInfos;
     }
 
-    public String getServerId() {
+    public Long getServerId() {
         return serverId;
     }
 
-    public void setServerId(String serverId) {
+    public void setServerId(Long serverId) {
         this.serverId = serverId;
     }
 }

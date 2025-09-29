@@ -1,14 +1,21 @@
 package com.gpu.rentaler.sys.monitor;
 
 import com.gpu.rentaler.MonitorService;
-import com.gpu.rentaler.entity.ServerInfo;
 import com.gpu.rentaler.common.JsonUtils;
+import com.gpu.rentaler.entity.GPUDeviceInfo;
+import com.gpu.rentaler.entity.ProcessInfo;
+import com.gpu.rentaler.entity.ServerInfo;
+import com.gpu.rentaler.sys.model.Server;
+import com.gpu.rentaler.sys.service.GPUDeviceService;
 import com.gpu.rentaler.sys.service.ServerService;
 import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.concurrent.Executor;
 
 @DubboService
 @Service
@@ -18,11 +25,15 @@ public class GPUMonitorService implements MonitorService {
     @Resource
     private ServerService serverService;
 
+    @Resource
+    private GPUDeviceService gpuDeviceService;
+
+    @Resource
+    private Executor executor;
+
     @Override
-    public void reportServerInfo(ServerInfo serverInfo) {
-        String stringify = JsonUtils.stringify(serverInfo);
-        serverService.saveOrUpdateServerInfo(
-            serverInfo.getServerId(),
+    public Long reportServerInfo(ServerInfo serverInfo) {
+        Server server = serverService.saveServerInfo(
             serverInfo.getHostname(),
             serverInfo.getIpAddress(),
             serverInfo.getCpuModel(),
@@ -31,6 +42,34 @@ public class GPUMonitorService implements MonitorService {
             serverInfo.getStorageTotalGb(),
             serverInfo.getGpuSlots()
         );
-        log.debug(stringify);
+        List<GPUDeviceInfo> gpuDeviceInfos = serverInfo.getGpuDeviceInfos();
+        gpuDeviceService.saveOrUpdateGPUDeviceInfo(server.getId(), gpuDeviceInfos);
+        return server.getId();
+    }
+
+    @Override
+    public void updateServerInfo(ServerInfo serverInfo) {
+        executor.execute(() -> {
+            serverService.updateServerInfo(
+                serverInfo.getServerId(),
+                serverInfo.getHostname(),
+                serverInfo.getIpAddress(),
+                serverInfo.getCpuModel(),
+                serverInfo.getCpuCores(),
+                serverInfo.getRamTotalGb(),
+                serverInfo.getStorageTotalGb(),
+                serverInfo.getGpuSlots()
+            );
+            List<GPUDeviceInfo> gpuDeviceInfos = serverInfo.getGpuDeviceInfos();
+            gpuDeviceService.saveOrUpdateGPUDeviceInfo(serverInfo.getServerId(), gpuDeviceInfos);
+        });
+    }
+
+    @Override
+    public void reportProcessMsg(Long serverId, List<ProcessInfo> processInfos) {
+        executor.execute(() -> {
+            String stringify = JsonUtils.stringify(processInfos);
+            log.info(stringify);
+        });
     }
 }

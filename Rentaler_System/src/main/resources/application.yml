@@ -49,12 +49,6 @@ dubbo:
         logger: slf4j  # 日志输出方式
         qos-port: 33333
 
-    # 服务消费者配置
-    consumer:
-        timeout: 3000  # 消费超时时间(毫秒)
-        check: false  # 启动时是否检查服务是否存在
-        loadbalance: roundrobin  # 负载均衡策略
-
     # 服务提供者配置
     provider:
         timeout: 3000  # 服务调用超时时间(毫秒)

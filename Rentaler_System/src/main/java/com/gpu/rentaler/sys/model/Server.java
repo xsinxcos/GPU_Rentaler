@@ -1,98 +1,44 @@
 package com.gpu.rentaler.sys.model;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 
 @Entity
 @Table(name = "servers", schema = "gpu_rentaler_0")
 public class Server extends BaseEntity {
-
-    @Size(max = 64)
-    @NotNull
-    @Column(name = "server_id", nullable = false, length = 64)
-    private String serverId;
-
-    @Size(max = 128)
-    @NotNull
-    @Column(name = "hostname", nullable = false, length = 128)
     private String hostname;
 
-    @Size(max = 45)
-    @NotNull
-    @Column(name = "ip_address", nullable = false, length = 45)
     private String ipAddress;
 
-    @Size(max = 128)
-    @Column(name = "location", length = 128)
     private String location;
 
-    @Size(max = 128)
-    @Column(name = "cpu_model", length = 128)
     private String cpuModel;
 
-    @Column(name = "cpu_cores")
     private Integer cpuCores;
 
-    @Column(name = "ram_total_gb")
     private Integer ramTotalGb;
 
-    @Column(name = "storage_total_gb")
     private Integer storageTotalGb;
 
-    @Column(name = "gpu_slots")
     private Integer gpuSlots;
 
-    @ColumnDefault("'online'")
-    @Lob
-    @Column(name = "status")
     private String status;
 
-    @Column(name = "load_average", precision = 4, scale = 2)
     private BigDecimal loadAverage;
 
-    @Column(name = "cpu_usage", precision = 5, scale = 2)
     private BigDecimal cpuUsage;
 
-    @Column(name = "memory_usage", precision = 5, scale = 2)
     private BigDecimal memoryUsage;
 
-    @Column(name = "disk_usage", precision = 5, scale = 2)
     private BigDecimal diskUsage;
 
-    @Column(name = "bandwidth_mbps")
     private Integer bandwidthMbps;
 
-    @Size(max = 64)
-    @Column(name = "datacenter", length = 64)
     private String datacenter;
 
-    @Size(max = 64)
-    @Column(name = "region", length = 64)
     private String region;
-
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "created_time")
-    private Instant createdTime;
-
-    @ColumnDefault("CURRENT_TIMESTAMP")
-    @Column(name = "updated_time")
-    private Instant updatedTime;
-
-    public String getServerId() {
-        return serverId;
-    }
-
-    public void setServerId(String serverId) {
-        this.serverId = serverId;
-    }
 
     public String getHostname() {
         return hostname;
@@ -220,22 +166,6 @@ public class Server extends BaseEntity {
 
     public void setRegion(String region) {
         this.region = region;
-    }
-
-    public Instant getCreatedTime() {
-        return createdTime;
-    }
-
-    public void setCreatedTime(Instant createdTime) {
-        this.createdTime = createdTime;
-    }
-
-    public Instant getUpdatedTime() {
-        return updatedTime;
-    }
-
-    public void setUpdatedTime(Instant updatedTime) {
-        this.updatedTime = updatedTime;
     }
 
 }

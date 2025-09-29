@@ -2,7 +2,8 @@ package com.gpu.rentaler;
 
 import com.gpu.rentaler.entity.GPUDeviceInfo;
 import com.gpu.rentaler.entity.ServerInfo;
-import com.gpu.rentaler.service.GPUInfoCollector;
+import com.gpu.rentaler.service.GPUFactory;
+import com.gpu.rentaler.service.ServerIDManager;
 import com.gpu.rentaler.service.ServerInfoCollector;
 import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboReference;
@@ -10,35 +11,43 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 public class StartupService implements CommandLineRunner {
+    // 原子布尔值确保线程安全的执行标记
+    private static final AtomicBoolean HAS_EXECUTED = new AtomicBoolean(false);
+
     @DubboReference
-    MonitorService monitorService;
+    MonitorService monitorService;  // 注意：确保此类已正确定义
 
     @Resource
-    private GPUInfoCollector gpuInfoCollector;
+    private GPUFactory gpuFactory;
 
     @Resource
     private ServerInfoCollector serverInfoCollector;
-    /**
-     * 程序启动完成后执行的方法
-     */
+
+    @Resource
+    private ServerIDManager serverIDManager;
+
     @Override
-    public void run(String... args) throws Exception {
-        // 调用需要在启动后执行的方法
-        executeOnStartup();
+    public void run(String... args) {
+        // 仅当未执行过时才执行，使用原子操作保证线程安全
+        if (HAS_EXECUTED.compareAndSet(false, true)) {
+            executeOnStartup();
+        }
     }
 
-    /**
-     * 启动后需要执行的业务方法
-     */
     private void executeOnStartup() {
-        System.out.println("程序已完整启动，正在执行初始化操作...");
         ServerInfo serverInfo = serverInfoCollector.getServerInfo();
-        List<GPUDeviceInfo> allGPUInfo = gpuInfoCollector.getAllGPUInfo();
+        List<GPUDeviceInfo> allGPUInfo = gpuFactory.getAllGPUInfo();
         serverInfo.setGpuDeviceInfos(allGPUInfo);
 
-        monitorService.reportServerInfo(serverInfo);
+        if (serverInfo.getServerId() == null) {
+            Long serverId = monitorService.reportServerInfo(serverInfo);
+            serverIDManager.saveServerID(serverId);
+        } else {
+            monitorService.updateServerInfo(serverInfo);
+        }
     }
 }

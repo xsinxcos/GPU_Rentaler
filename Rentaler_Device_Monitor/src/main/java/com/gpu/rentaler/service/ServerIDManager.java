@@ -9,15 +9,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.UUID;
 
 @Component
-public class UUIDManager {
+public class ServerIDManager {
     private final UUIDProperties uuidProperties;
-    private String applicationUUID;
+    private Long serverId;
 
     @Autowired
-    public UUIDManager(UUIDProperties uuidProperties) {
+    public ServerIDManager(UUIDProperties uuidProperties) {
         this.uuidProperties = uuidProperties;
     }
 
@@ -29,26 +28,21 @@ public class UUIDManager {
 
             // 如果文件存在则读取
             if (uuidFile.exists() && uuidFile.isFile()) {
-                applicationUUID = readUUIDFromFile(uuidFile);
-            } else {
-                // 文件不存在则生成新UUID并保存
-                applicationUUID = generateAndSaveUUID(uuidFile);
+                serverId = readServerFromFile(uuidFile);
             }
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize application UUID", e);
         }
     }
 
-    private String readUUIDFromFile(File file) throws IOException {
+    private Long readServerFromFile(File file) throws IOException {
         // 读取文件内容
         byte[] bytes = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
-        return new String(bytes, uuidProperties.getFileCharset());
+        return Long.valueOf(new String(bytes, uuidProperties.getFileCharset()));
     }
 
-    private String generateAndSaveUUID(File file) throws IOException {
-        // 生成新的UUID
-        String newUUID = UUID.randomUUID().toString();
-
+    public Long saveServerID(Long serverId){
+        File file = new File(uuidProperties.getFilePath());
         // 确保父目录存在
         File parentDir = file.getParentFile();
         if (parentDir != null && !parentDir.exists()) {
@@ -56,10 +50,14 @@ public class UUIDManager {
         }
 
         // 写入文件
-        Files.write(Paths.get(file.getAbsolutePath()),
-            newUUID.getBytes(uuidProperties.getFileCharset()));
+        try {
+            Files.write(Paths.get(file.getAbsolutePath()),
+                String.valueOf(serverId).getBytes(uuidProperties.getFileCharset()));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
-        return newUUID;
+        return serverId;
     }
 
     /**
@@ -67,7 +65,7 @@ public class UUIDManager {
      *
      * @return UUID字符串
      */
-    public String getApplicationUUID() {
-        return applicationUUID;
+    public Long getServerId() {
+        return serverId;
     }
 }

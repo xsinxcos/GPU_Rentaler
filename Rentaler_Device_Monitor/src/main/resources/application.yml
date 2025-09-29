@@ -23,12 +23,6 @@ dubbo:
     application:
         logger: slf4j  # 日志输出方式
 
-    # 服务提供者配置
-    provider:
-        timeout: 3000  # 服务调用超时时间(毫秒)
-        retries: 0  # 服务调用重试次数
-        loadbalance: roundrobin  # 负载均衡策略
-
     # 服务消费者配置
     consumer:
         timeout: 3000  # 消费超时时间(毫秒)
