@@ -1,5 +1,6 @@
-package com.gpu.rentaler;
+package com.gpu.rentaler.service;
 
+import com.gpu.rentaler.entity.ContainerInfo;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.ExecuteException;
@@ -34,6 +35,39 @@ public class DockerComposeExecutor {
     public void addEnvironmentVariable(String key, String value) {
         environmentVariables.put(key, value);
     }
+
+    public ContainerInfo getContainerInfo() throws IOException {
+        ExecutionResult psResult = ps();
+        if (!psResult.isSuccess()) {
+            throw new RuntimeException("Failed to get container info: " + psResult.getError());
+        }
+
+        String output = psResult.getOutput();
+        String containerId = null;
+        String port = null;
+
+        // 简单解析 ps 输出，假设格式类似：
+        // Name                    Command               State               Ports
+        // my_container   "/bin/bash"            Up                  0.0.0.0:2222->22/tcp
+        String[] lines = output.split("\n");
+        if (lines.length >= 2) {
+            String[] parts = lines[1].split("\\s+");
+            containerId = parts[0]; // 容器名
+            for (String part : parts) {
+                if (part.contains("->")) {
+                    port = part.split("->")[0].replaceAll("0.0.0.0:", "");
+                    break;
+                }
+            }
+        }
+
+        // SSH 默认信息（可从环境变量获取）
+        String sshName = environmentVariables.getOrDefault("SSH_USER", "root");
+        String sshPassword = environmentVariables.getOrDefault("SSH_PASSWORD", "root");
+
+        return new ContainerInfo(containerId, port, sshName, sshPassword);
+    }
+
 
     /**
      * 执行docker-compose命令

@@ -1,0 +1,16 @@
+services:
+    nvidia-container:
+        image: nvidia-docker
+        build: .
+        environment:
+            - USER_PASSWORD=123456
+            - NVIDIA_VISIBLE_DEVICES=all
+            - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+        runtime: nvidia
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - capabilities: [gpu]
+        ports:
+            - "2223:22"

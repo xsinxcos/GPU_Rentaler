@@ -1,0 +1,14 @@
+version: "3.9"
+services:
+    amd-container:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - USER_PASSWORD=${SSH_PASSWORD}
+        runtime: runc
+        devices:
+            - /dev/kfd
+            - /dev/dri
+        ports:
+            - "2223:22"

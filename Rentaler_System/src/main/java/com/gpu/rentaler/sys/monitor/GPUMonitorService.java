@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@DubboService
+@DubboService(version = "1.0.0")
 @Service
 public class GPUMonitorService implements MonitorService {
     private static final Logger log = LogManager.getLogger(GPUMonitorService.class);

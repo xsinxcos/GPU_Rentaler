@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/test")
 public class TestController {
@@ -20,6 +22,6 @@ public class TestController {
 
     @GetMapping
     public void test() {
-        deviceTaskService.createDockerContainer(45L);
+        deviceTaskService.createDockerContainer(45L , List.of(6L));
     }
 }

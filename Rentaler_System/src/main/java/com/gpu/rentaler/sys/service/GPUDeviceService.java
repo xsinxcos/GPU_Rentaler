@@ -70,4 +70,12 @@ public class GPUDeviceService {
             gpuDeviceRepository.save(device);
         }
     }
+
+    public GPUDevice getById(Long gpuDeviceId) {
+        return gpuDeviceRepository.findById(gpuDeviceId).orElse(null);
+    }
+
+    public List<GPUDevice> getById(List<Long> gpuDeviceIds) {
+        return gpuDeviceRepository.findAllById(gpuDeviceIds);
+    }
 }
