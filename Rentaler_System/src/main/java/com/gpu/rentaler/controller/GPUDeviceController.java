@@ -58,7 +58,7 @@ public class GPUDeviceController {
     public ResponseEntity<GPUDeviceCertificateDTO> leaseGPUDevice(@PathVariable String deviceId) {
         //todo
         // 租用GPU设备的逻辑
-        return ResponseEntity.ok(new GPUDeviceCertificateDTO("1", "test", "test" ,"127.0.0.1:2222"));
+        return ResponseEntity.ok(new GPUDeviceCertificateDTO("1", "test", "test", "127.0.0.1:2222"));
     }
 
     @RequiresPermissions("gpu:return")
@@ -77,4 +77,12 @@ public class GPUDeviceController {
         return ResponseEntity.ok(new PageDTO<>(new ArrayList<>(), 0));
     }
 
+
+    @RequiresPermissions("gpu:alllease")
+    @GetMapping("/alllease")
+    public ResponseEntity<PageDTO<GPURantalDTO>> findAllLeaseGPUDevices(Pageable pageable) {
+        //todo
+        // 获取所有租用的GPU设备的逻辑
+        return ResponseEntity.ok(new PageDTO<>(new ArrayList<>(), 0));
+    }
 }

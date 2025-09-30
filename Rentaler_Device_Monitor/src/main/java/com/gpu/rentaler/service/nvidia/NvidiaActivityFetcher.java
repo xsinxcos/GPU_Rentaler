@@ -34,6 +34,28 @@ public class NvidiaActivityFetcher implements GPUActivityFetcher {
         return parseProcessList(result);
     }
 
+    @Override
+    public List<ProcessInfo> getGpuProcessInDockerContainer(String containerId) {
+        CommandLine cmdLine = CommandLine.parse(
+            "docker exec " + containerId + " nvidia-smi --query-compute-apps=pid,process_name,gpu_uuid,used_memory --format=csv,noheader,nounits"
+        );
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+
+        DefaultExecutor executor = new DefaultExecutor();
+        executor.setStreamHandler(streamHandler);
+        try {
+            executor.execute(cmdLine);
+        } catch (IOException e) {
+            log.info("获取NVIDIA GPU进程信息失败: {}", e.getMessage());
+            return List.of();
+        }
+        String result = outputStream.toString().trim();
+        List<ProcessInfo> processInfos = parseProcessList(result);
+        processInfos.forEach(item -> item.setContainerId(containerId));
+        return processInfos;
+    }
+
     private List<ProcessInfo> parseProcessList(String rawOutput) {
         List<ProcessInfo> list = new ArrayList<>();
         String[] lines = rawOutput.split("\\r?\\n");
@@ -43,7 +65,7 @@ public class NvidiaActivityFetcher implements GPUActivityFetcher {
                 ProcessInfo info = new ProcessInfo();
                 info.setPid(parts[0].trim());
                 info.setName(parts[1].trim());
-                info.setGpuUuid(parts[2].trim());
+                info.setDeviceId(parts[2].trim());
                 info.setUsedMemoryMB(parts[3].trim());
                 list.add(info);
             }

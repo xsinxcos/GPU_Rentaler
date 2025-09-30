@@ -6,6 +6,7 @@ import java.time.Instant;
 
 public record GPURantalDTO(
     GPUDevice gpuDevice,
+    Long userId,
     String gpuDeviceId,
     Instant startTime,
     Instant endTime,

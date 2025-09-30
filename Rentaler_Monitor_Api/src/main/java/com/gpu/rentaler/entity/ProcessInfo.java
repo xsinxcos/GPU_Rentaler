@@ -5,13 +5,19 @@ import java.io.Serializable;
 public class ProcessInfo implements Serializable {
     String pid;
     String name;
-    String gpuUuid;
+    String deviceId;
     String usedMemoryMB;
+    String containerId; // Optional: Docker container ID if applicable
 
-    @Override
-    public String toString() {
-        return "PID: " + pid + ", Name: " + name +
-            ", GPU UUID: " + gpuUuid + ", Memory: " + usedMemoryMB + " MiB";
+    public ProcessInfo(String pid, String name, String deviceId, String usedMemoryMB, String containerId) {
+        this.pid = pid;
+        this.name = name;
+        this.deviceId = deviceId;
+        this.usedMemoryMB = usedMemoryMB;
+        this.containerId = containerId;
+    }
+
+    public ProcessInfo() {
     }
 
     public String getPid() {
@@ -30,12 +36,12 @@ public class ProcessInfo implements Serializable {
         this.name = name;
     }
 
-    public String getGpuUuid() {
-        return gpuUuid;
+    public String getDeviceId() {
+        return deviceId;
     }
 
-    public void setGpuUuid(String gpuUuid) {
-        this.gpuUuid = gpuUuid;
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     public String getUsedMemoryMB() {
@@ -44,5 +50,13 @@ public class ProcessInfo implements Serializable {
 
     public void setUsedMemoryMB(String usedMemoryMB) {
         this.usedMemoryMB = usedMemoryMB;
+    }
+
+    public String getContainerId() {
+        return containerId;
+    }
+
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
     }
 }

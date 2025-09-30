@@ -20,12 +20,12 @@ import java.util.List;
 @RestController
 public class WalletController {
 
-    @RequiresPermissions("wallet:show")
-    @GetMapping("/show")
+    @RequiresPermissions("wallet:my")
+    @GetMapping("/my")
     public ResponseEntity<WalletDTO> show() {
         //todo
         // 查询钱包信息的逻辑
-        return ResponseEntity.ok(new WalletDTO(1L ,1L ,"1" ,0 , Instant.now()));
+        return ResponseEntity.ok(new WalletDTO(1L, 1L, "1", 0, Instant.now()));
     }
 
     @RequiresPermissions("wallet:rechargeQrcode")
@@ -33,7 +33,7 @@ public class WalletController {
     public ResponseEntity<RechargeQrCodeDTO> rechargeQrCode() {
         //todo
         // 充值的逻辑
-        return ResponseEntity.ok(new RechargeQrCodeDTO("11" ,1L ,"test"));
+        return ResponseEntity.ok(new RechargeQrCodeDTO("11", 1L, "test"));
     }
 
     @RequiresPermissions("wallet:list")

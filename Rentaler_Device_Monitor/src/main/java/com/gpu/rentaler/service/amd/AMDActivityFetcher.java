@@ -28,6 +28,26 @@ public class AMDActivityFetcher implements GPUActivityFetcher {
         }
     }
 
+    @Override
+    public List<ProcessInfo> getGpuProcessInDockerContainer(String containerId) {
+        CommandLine cmdLine = CommandLine.parse("docker exec " + containerId + " rocm-smi --showprocs");
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PumpStreamHandler streamHandler = new PumpStreamHandler(outputStream);
+
+        DefaultExecutor executor = new DefaultExecutor();
+        executor.setStreamHandler(streamHandler);
+        try {
+            executor.execute(cmdLine);
+        } catch (IOException e) {
+            return List.of();
+        }
+
+        String result = outputStream.toString().trim();
+        List<ProcessInfo> processInfos = parseAMDProcessOutput(result);
+        processInfos.forEach(item -> item.setContainerId(containerId));
+        return processInfos;
+    }
+
     public static List<ProcessInfo> getAMDProcesses() throws IOException {
         CommandLine cmdLine = CommandLine.parse("rocm-smi --showprocs");
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -48,7 +68,7 @@ public class AMDActivityFetcher implements GPUActivityFetcher {
             if (line.matches("\\s*\\d+\\s+\\d+\\s+.*")) {
                 String[] parts = line.trim().split("\\s+", 3);
                 ProcessInfo p = new ProcessInfo();
-                p.setGpuUuid(parts[0]);
+                p.setDeviceId(parts[0]);
                 p.setPid(parts[1]);
                 p.setName(parts[2]);
                 list.add(p);

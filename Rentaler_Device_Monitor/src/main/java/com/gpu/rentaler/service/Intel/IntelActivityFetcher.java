@@ -13,4 +13,9 @@ public class IntelActivityFetcher implements GPUActivityFetcher {
         // 不支持
         return List.of();
     }
+
+    @Override
+    public List<ProcessInfo> getGpuProcessInDockerContainer(String containerId) {
+        return List.of();
+    }
 }

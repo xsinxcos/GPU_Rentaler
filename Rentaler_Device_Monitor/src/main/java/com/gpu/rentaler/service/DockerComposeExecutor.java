@@ -9,7 +9,9 @@ import org.apache.commons.exec.PumpStreamHandler;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DockerComposeExecutor {
@@ -68,6 +70,84 @@ public class DockerComposeExecutor {
         return new ContainerInfo(containerId, port, sshName, sshPassword);
     }
 
+    /**
+     * 获取所有容器的ID列表
+     * @return 容器ID列表
+     * @throws IOException IO异常
+     */
+    public List<String> getAllContainerIds() throws IOException {
+        ExecutionResult psResult = ps();
+        if (!psResult.isSuccess()) {
+            throw new RuntimeException("Failed to get container IDs: " + psResult.getError());
+        }
+
+        List<String> containerIds = new ArrayList<>();
+        String output = psResult.getOutput();
+        String[] lines = output.split("\n");
+
+        // 跳过表头（第一行），从第二行开始解析
+        for (int i = 1; i < lines.length; i++) {
+            String line = lines[i].trim();
+            if (line.isEmpty()) {
+                continue;
+            }
+
+            // 解析每一行，获取容器名称（第一列）
+            String[] parts = line.split("\\s+");
+            if (parts.length > 0) {
+                String containerId = parts[0];
+                containerIds.add(containerId);
+            }
+        }
+
+        return containerIds;
+    }
+
+    /**
+     * 获取所有容器的详细信息列表
+     * @return 容器信息列表
+     * @throws IOException IO异常
+     */
+    public List<ContainerInfo> getAllContainerInfos() throws IOException {
+        ExecutionResult psResult = ps();
+        if (!psResult.isSuccess()) {
+            throw new RuntimeException("Failed to get container infos: " + psResult.getError());
+        }
+
+        List<ContainerInfo> containerInfos = new ArrayList<>();
+        String output = psResult.getOutput();
+        String[] lines = output.split("\n");
+
+        // SSH 默认信息
+        String sshName = environmentVariables.getOrDefault("SSH_USER", "root");
+        String sshPassword = environmentVariables.getOrDefault("SSH_PASSWORD", "root");
+
+        // 跳过表头，从第二行开始解析
+        for (int i = 1; i < lines.length; i++) {
+            String line = lines[i].trim();
+            if (line.isEmpty()) {
+                continue;
+            }
+
+            String[] parts = line.split("\\s+");
+            if (parts.length > 0) {
+                String containerId = parts[0];
+                String port = null;
+
+                // 查找端口映射信息
+                for (String part : parts) {
+                    if (part.contains("->")) {
+                        port = part.split("->")[0].replaceAll("0.0.0.0:", "");
+                        break;
+                    }
+                }
+
+                containerInfos.add(new ContainerInfo(containerId, port, sshName, sshPassword));
+            }
+        }
+
+        return containerInfos;
+    }
 
     /**
      * 执行docker-compose命令
@@ -107,7 +187,6 @@ public class DockerComposeExecutor {
             System.out.println("错误输出: " + errorStream.toString());
             e.printStackTrace();
         }
-
 
         // 返回执行结果
         return new ExecutionResult(
@@ -185,8 +264,8 @@ public class DockerComposeExecutor {
         @Override
         public String toString() {
             return "Exit Value: " + exitValue + "\n" +
-                   "Output: " + output + "\n" +
-                   "Error: " + error;
+                "Output: " + output + "\n" +
+                "Error: " + error;
         }
     }
 
@@ -215,6 +294,21 @@ public class DockerComposeExecutor {
             System.out.println("\nService status:");
             ExecutionResult statusResult = executor.ps();
             System.out.println(statusResult.getOutput());
+
+            // 获取所有容器ID
+            System.out.println("\nAll container IDs:");
+            List<String> containerIds = executor.getAllContainerIds();
+            for (String id : containerIds) {
+                System.out.println("- " + id);
+            }
+
+            // 获取所有容器详细信息
+            System.out.println("\nAll container infos:");
+            List<ContainerInfo> containerInfos = executor.getAllContainerInfos();
+            for (ContainerInfo info : containerInfos) {
+                System.out.println("- Container: " + info.getContainerId() +
+                    ", Port: " + info.getPort());
+            }
 
         } catch (Exception e) {
             e.printStackTrace();

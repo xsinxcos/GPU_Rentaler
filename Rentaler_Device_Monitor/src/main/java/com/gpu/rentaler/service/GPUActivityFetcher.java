@@ -8,4 +8,6 @@ public interface GPUActivityFetcher {
 
     List<ProcessInfo> getGpuProcessList();
 
+    List<ProcessInfo> getGpuProcessInDockerContainer(String containerId);
+
 }

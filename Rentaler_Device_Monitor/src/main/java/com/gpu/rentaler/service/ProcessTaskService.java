@@ -34,7 +34,7 @@ public class ProcessTaskService {
     @Scheduled(fixedRate = 5000) // 5秒
     public void executeTask() {
         try {
-            List<ProcessInfo> allGPUActivityInfo = gpuFactory.getAllGPUActivityInfo();
+            List<ProcessInfo> allGPUActivityInfo = gpuFactory.getAllDockerContainerGPUActivityInfo();
             Long serverId = serverIDManager.getServerId();
             monitorService.reportProcessMsg(serverId ,allGPUActivityInfo);
         }catch (Exception e){
