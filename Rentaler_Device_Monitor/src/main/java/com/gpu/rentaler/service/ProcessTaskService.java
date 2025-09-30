@@ -28,10 +28,10 @@ public class ProcessTaskService {
     private ServerIDManager serverIDManager;
 
     /**
-     * 每5秒执行一次的定时任务
+     * 每10秒执行一次的定时任务
      * fixedRate: 以固定速率执行，即从上一次任务开始时间算起，间隔指定时间后再次执行
      */
-    @Scheduled(fixedRate = 5000) // 5秒
+    @Scheduled(fixedRate = 10000) // 10秒
     public void executeTask() {
         try {
             List<ProcessInfo> allGPUActivityInfo = gpuFactory.getAllDockerContainerGPUActivityInfo();

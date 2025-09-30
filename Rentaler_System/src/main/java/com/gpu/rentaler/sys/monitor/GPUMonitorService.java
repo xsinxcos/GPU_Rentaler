@@ -7,6 +7,7 @@ import com.gpu.rentaler.entity.ProcessInfo;
 import com.gpu.rentaler.entity.ServerInfo;
 import com.gpu.rentaler.sys.model.Server;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
+import com.gpu.rentaler.sys.service.GPUProcessActivityService;
 import com.gpu.rentaler.sys.service.ServerService;
 import jakarta.annotation.Resource;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -30,6 +31,9 @@ public class GPUMonitorService implements MonitorService {
 
     @Resource
     private ServerHeartBeatRecord serverHeartBeatRecord;
+
+    @Resource
+    private GPUProcessActivityService gpuProcessActivityService;
 
     @Override
     public Long reportServerInfo(ServerInfo serverInfo) {
@@ -69,8 +73,8 @@ public class GPUMonitorService implements MonitorService {
     public void reportProcessMsg(Long serverId, List<ProcessInfo> processInfos) {
         asyncExecute(() -> {
             serverHeartBeatRecord.recordHeartBeat(serverId);
-            String stringify = JsonUtils.stringify(processInfos);
-            log.info(stringify);
+            processInfos.forEach(item ->
+                gpuProcessActivityService.saveActivity(item.getPid() ,item.getName() ,item.getDeviceId() ,item.getTime()));
         });
     }
 

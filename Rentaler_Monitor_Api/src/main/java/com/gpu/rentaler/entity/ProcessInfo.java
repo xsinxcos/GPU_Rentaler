@@ -1,6 +1,7 @@
 package com.gpu.rentaler.entity;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 public class ProcessInfo implements Serializable {
     String pid;
@@ -8,6 +9,7 @@ public class ProcessInfo implements Serializable {
     String deviceId;
     String usedMemoryMB;
     String containerId; // Optional: Docker container ID if applicable
+    Instant time = Instant.now();
 
     public ProcessInfo(String pid, String name, String deviceId, String usedMemoryMB, String containerId) {
         this.pid = pid;
@@ -58,5 +60,9 @@ public class ProcessInfo implements Serializable {
 
     public void setContainerId(String containerId) {
         this.containerId = containerId;
+    }
+
+    public Instant getTime() {
+        return time;
     }
 }

@@ -5,6 +5,7 @@ import com.gpu.rentaler.config.DockerFileLocation;
 import com.gpu.rentaler.constant.GPUType;
 import com.gpu.rentaler.entity.ContainerInfo;
 import com.gpu.rentaler.entity.DockerCreateResInfo;
+import com.gpu.rentaler.utils.DockerExecutor;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,5 +46,14 @@ public class TaskExecuteService implements TaskAssignService {
             }
         });
         return createResInfo;
+    }
+
+    @Override
+    public void stopDockerContainer(String containerId) {
+        try {
+            DockerExecutor.stopContainer(containerId ,60);
+        } catch (IOException e) {
+            log.error("Error stopping container {}: {}", containerId, e.getMessage());
+        }
     }
 }
