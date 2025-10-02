@@ -26,14 +26,6 @@ public class Server extends BaseEntity {
 
     private String status;
 
-    private BigDecimal loadAverage;
-
-    private BigDecimal cpuUsage;
-
-    private BigDecimal memoryUsage;
-
-    private BigDecimal diskUsage;
-
     private Integer bandwidthMbps;
 
     private String datacenter;
@@ -110,38 +102,6 @@ public class Server extends BaseEntity {
 
     public void setStatus(String status) {
         this.status = status;
-    }
-
-    public BigDecimal getLoadAverage() {
-        return loadAverage;
-    }
-
-    public void setLoadAverage(BigDecimal loadAverage) {
-        this.loadAverage = loadAverage;
-    }
-
-    public BigDecimal getCpuUsage() {
-        return cpuUsage;
-    }
-
-    public void setCpuUsage(BigDecimal cpuUsage) {
-        this.cpuUsage = cpuUsage;
-    }
-
-    public BigDecimal getMemoryUsage() {
-        return memoryUsage;
-    }
-
-    public void setMemoryUsage(BigDecimal memoryUsage) {
-        this.memoryUsage = memoryUsage;
-    }
-
-    public BigDecimal getDiskUsage() {
-        return diskUsage;
-    }
-
-    public void setDiskUsage(BigDecimal diskUsage) {
-        this.diskUsage = diskUsage;
     }
 
     public Integer getBandwidthMbps() {

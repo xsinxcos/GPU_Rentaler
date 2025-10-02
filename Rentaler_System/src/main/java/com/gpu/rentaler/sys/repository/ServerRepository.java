@@ -1,11 +1,15 @@
 package com.gpu.rentaler.sys.repository;
 
 import com.gpu.rentaler.sys.model.Server;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface ServerRepository extends JpaRepository<Server, Long> {
+    @Query("select s from Server s")
+    Page<Server> findServers(Pageable pageable);
+
 }

@@ -1,6 +1,8 @@
 package com.gpu.rentaler.sys.service.dto;
 
-public record ServerDTO(String hostname,
+public record ServerDTO(
+    Long id,
+                        String hostname,
 
                         String ipAddress,
 
@@ -16,20 +18,5 @@ public record ServerDTO(String hostname,
 
                         Integer gpuSlots,
 
-                        String status,
-
-                        String loadAverage,
-
-                        String cpuUsage,
-
-
-                        String memoryUsage,
-
-
-                        String diskUsage,
-
-                        String bandwidthMbps,
-
-                        String atacenter,
-                        String region) {
+                        String status,String datacenter, String region) {
 }
