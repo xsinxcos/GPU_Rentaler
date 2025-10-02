@@ -31,7 +31,6 @@ public class DeviceTaskService {
         if (!devices.isEmpty()) {
             GPUDevice first = devices.getFirst();
             String brand = first.getBrand();
-            // 假设运行时决定调用的 provider IP/Port
             String ip = server.getIpAddress();
             int port = 20880;
 

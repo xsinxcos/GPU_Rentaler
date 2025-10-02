@@ -7,5 +7,5 @@ public record GPUDeviceDTO(
     Long memoryTotal,
     String architecture,
     String memoryType,
-    String status, Boolean isRentable, String hourlyRate, String totalRuntimeHours, BigDecimal totalRevenue) {
+    String status, Boolean isRentable, String hourlyRate, String totalRuntimeHours, String totalRevenue) {
 }
