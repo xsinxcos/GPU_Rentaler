@@ -3,8 +3,6 @@ package com.gpu.rentaler.sys.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 
-import java.math.BigDecimal;
-
 @Entity
 @Table(name = "servers", schema = "gpu_rentaler_0")
 public class Server extends BaseEntity {

@@ -1,7 +1,7 @@
 package com.gpu.rentaler.sys.model;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "gpu_process_write_list", schema = "gpu_rentaler_0")

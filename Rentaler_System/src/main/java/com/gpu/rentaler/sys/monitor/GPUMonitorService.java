@@ -1,7 +1,6 @@
 package com.gpu.rentaler.sys.monitor;
 
 import com.gpu.rentaler.MonitorService;
-import com.gpu.rentaler.common.JsonUtils;
 import com.gpu.rentaler.entity.GPUDeviceInfo;
 import com.gpu.rentaler.entity.ProcessInfo;
 import com.gpu.rentaler.entity.ServerInfo;

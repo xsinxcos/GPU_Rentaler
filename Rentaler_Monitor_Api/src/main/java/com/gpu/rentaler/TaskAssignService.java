@@ -1,6 +1,7 @@
 package com.gpu.rentaler;
 
 
+import com.gpu.rentaler.entity.DContainerInfoResp;
 import com.gpu.rentaler.entity.VirtulBoxResInfo;
 
 import java.io.InputStream;
@@ -10,5 +11,5 @@ public interface TaskAssignService {
 
     void stopDockerContainer(String containerId);
 
-    void upDockerImage(InputStream inputStream);
+    DContainerInfoResp upDockerImage(InputStream inputStream , String imageName);
 }

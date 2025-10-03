@@ -13,7 +13,6 @@ import com.gpu.rentaler.sys.repository.UserRepository;
 import com.gpu.rentaler.sys.service.dto.OrgUserDTO;
 import com.gpu.rentaler.sys.service.dto.PageDTO;
 import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
-import jakarta.validation.constraints.NotBlank;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Example;

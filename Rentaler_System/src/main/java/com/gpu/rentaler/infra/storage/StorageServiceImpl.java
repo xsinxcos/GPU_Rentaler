@@ -196,13 +196,14 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public PageDTO<StorageFileDTO> getFileByCreateName(Pageable pageable ,String name) {
+    public PageDTO<StorageFileDTO> getImageFileByCreateName(Pageable pageable , String name) {
         Page<StorageFile> storageFiles = storageFileRepository.findByCreateUser(name, pageable);
-        List<StorageFileDTO> dtos = storageFiles.get().map(item -> {
+        List<StorageFileDTO> dtos = storageFiles.get().
+            map(item -> {
             StorageFileDTO dto = new StorageFileDTO();
             BeanUtils.copyProperties(item, dto);
             return dto;
-        }).toList();
+        }).filter(item -> "application/x-tar".equalsIgnoreCase(item.getType())).toList();
         return new PageDTO<>(dtos ,storageFiles.getTotalElements());
     }
 

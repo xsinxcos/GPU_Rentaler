@@ -19,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -98,14 +97,6 @@ public class GPUDeviceController {
         gpuDeviceService.returnDevice(deviceId);
         // todo 完善租借表
         return ResponseEntity.noContent().build();
-    }
-
-    @RequiresPermissions("gpu:mylease")
-    @PostMapping("/mylease")
-    public ResponseEntity<PageDTO<GPURantalDTO>> findMyLeaseGPUDevices(Pageable pageable) {
-        //todo
-        // 获取我租用的GPU设备的逻辑
-        return ResponseEntity.ok(new PageDTO<>(new ArrayList<>(), 0));
     }
 
 }

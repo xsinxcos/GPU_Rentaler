@@ -24,6 +24,10 @@ spring:
         web:
             pageable:
                 one-indexed-parameters: true
+    servlet:
+        multipart:
+            max-file-size: 1000GB
+            max-request-size: 1000GB
 server:
     servlet:
         context-path: /admin3

@@ -1,7 +1,6 @@
 package com.gpu.rentaler.entity;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 /**
  * GPU设备信息实体类
@@ -18,7 +17,7 @@ public class GPUDeviceInfo implements Serializable {
     private Integer tensorCores;
     private Integer baseClock;
     private Integer boostClock;
-    private String status = "active";
+    private String status = "ONLINE";
 
     // 构造函数
     public GPUDeviceInfo() {

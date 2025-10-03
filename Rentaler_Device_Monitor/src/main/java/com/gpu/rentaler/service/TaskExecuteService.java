@@ -4,6 +4,8 @@ import com.gpu.rentaler.TaskAssignService;
 import com.gpu.rentaler.config.DockerFileLocation;
 import com.gpu.rentaler.constant.GPUType;
 import com.gpu.rentaler.entity.ContainerInfo;
+import com.gpu.rentaler.entity.DContainerInfo;
+import com.gpu.rentaler.entity.DContainerInfoResp;
 import com.gpu.rentaler.entity.VirtulBoxResInfo;
 import com.gpu.rentaler.utils.DockerExecutor;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -52,14 +54,21 @@ public class TaskExecuteService implements TaskAssignService {
     @Override
     public void stopDockerContainer(String containerId) {
         try {
-            DockerExecutor.stopContainer(containerId ,60);
+            DockerExecutor.stopContainer(containerId, 60);
         } catch (IOException e) {
             log.error("Error stopping container {}: {}", containerId, e.getMessage());
         }
     }
 
     @Override
-    public void upDockerImage(InputStream inputStream) {
-
+    public DContainerInfoResp upDockerImage(InputStream inputStream, String imageName) {
+        try {
+            DockerExecutor.loadImageFromInputStream(inputStream, 300);
+            DContainerInfo dContainerInfo = DockerExecutor.runContainerAndGetInfo(imageName);
+            return new DContainerInfoResp(dContainerInfo.containerName(), dContainerInfo.containerId());
+        } catch (IOException e) {
+            log.warn(" {} 镜像导入失败：{}", imageName, e.getMessage());
+        }
+        return new DContainerInfoResp(null, null);
     }
 }

@@ -35,5 +35,5 @@ public interface StorageService {
 
     Resource loadAsResource(String key);
 
-    PageDTO<StorageFileDTO> getFileByCreateName(Pageable pageable , String name);
+    PageDTO<StorageFileDTO> getImageFileByCreateName(Pageable pageable , String name);
 }

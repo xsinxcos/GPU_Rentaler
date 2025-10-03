@@ -1,7 +1,13 @@
 package com.gpu.rentaler.common;
 
+import org.apache.commons.compress.archivers.ArchiveEntry;
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
+import java.util.Set;
 
 public class FileUtils {
     /**
@@ -10,32 +16,36 @@ public class FileUtils {
      * @return true如果是有效的Docker镜像文件，否则返回false
      */
     public static boolean isDockerImage(InputStream bis) {
-        try (TarInputStream tis = new TarInputStream(bis)) {
+        try (TarArchiveInputStream tarInput = new TarArchiveInputStream(new BufferedInputStream(bis))) {
+            Set<String> entryNames = new HashSet<>();
+            ArchiveEntry entry;
 
-            boolean hasManifest = false;
-            boolean hasLayerOrConfig = false;
-
-            TarEntry entry;
-            while ((entry = tis.getNextEntry()) != null) {
+            while ((entry = tarInput.getNextEntry()) != null) {
                 String name = entry.getName();
+                entryNames.add(name);
 
-                // 检查manifest.json（Docker镜像必需文件）
-                if (name.equals("manifest.json")) {
-                    hasManifest = true;
+                // 提前返回优化：有明显 docker 文件结构
+                if (name.equals("manifest.json") || name.startsWith("layer.tar") || name.endsWith("/layer.tar")) {
+                    return true; // docker save 导出的镜像
                 }
-
-                // 检查是否有layer.tar或配置json文件
-                if (name.endsWith("/layer.tar") ||
-                    name.matches("^[a-f0-9]{64}\\.json$")) {
-                    hasLayerOrConfig = true;
+                if (name.equals("etc/hosts") || name.equals("bin/sh") || name.equals("root/.bashrc")) {
+                    return true; // docker export 导出的容器文件系统
                 }
             }
 
-            // Docker镜像至少要有manifest.json
-            return hasManifest;
+            // 兜底判断：检查 entry 数量/特征
+            if (entryNames.contains("manifest.json")) {
+                return true;
+            }
+            if (entryNames.stream().anyMatch(n -> n.endsWith("/layer.tar"))) {
+                return true;
+            }
 
         } catch (IOException e) {
+            // 不是有效的 tar 文件
             return false;
         }
+
+        return false;
     }
 }

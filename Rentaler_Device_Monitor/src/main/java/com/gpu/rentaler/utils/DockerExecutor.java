@@ -1,5 +1,6 @@
 package com.gpu.rentaler.utils;
 
+import com.gpu.rentaler.entity.DContainerInfo;
 import org.apache.commons.exec.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -34,10 +36,21 @@ public class DockerExecutor {
             this.error = error;
         }
 
-        public int getExitCode() { return exitCode; }
-        public String getOutput() { return output; }
-        public String getError() { return error; }
-        public boolean isSuccess() { return exitCode == 0; }
+        public int getExitCode() {
+            return exitCode;
+        }
+
+        public String getOutput() {
+            return output;
+        }
+
+        public String getError() {
+            return error;
+        }
+
+        public boolean isSuccess() {
+            return exitCode == 0;
+        }
 
         @Override
         public String toString() {
@@ -50,7 +63,7 @@ public class DockerExecutor {
      * 执行Docker命令
      */
     public static ExecuteResult execute(String command, int timeoutSeconds)
-            throws IOException {
+        throws IOException {
         CommandLine cmdLine = CommandLine.parse(command);
         return executeCommand(cmdLine, timeoutSeconds);
     }
@@ -72,18 +85,19 @@ public class DockerExecutor {
 
     /**
      * 获取所有容器ID
+     *
      * @param all true-包含已停止的容器, false-仅运行中的容器
      * @return 容器ID列表
      */
     public static java.util.List<String> getAllContainerIds(boolean all)
-            throws IOException {
+        throws IOException {
         String cmd = all ?
             "docker ps -a -q" : "docker ps -q";
         ExecuteResult result = execute(cmd);
 
         java.util.List<String> containerIds = new java.util.ArrayList<>();
         if (result.isSuccess() && result.getOutput() != null &&
-                !result.getOutput().isEmpty()) {
+            !result.getOutput().isEmpty()) {
             String[] ids = result.getOutput().split("\\n");
             for (String id : ids) {
                 String trimmedId = id.trim();
@@ -106,7 +120,7 @@ public class DockerExecutor {
      * 停止容器
      */
     public static ExecuteResult stopContainer(String containerId, int timeout)
-            throws IOException {
+        throws IOException {
         return execute(String.format("docker stop -t %d %s", timeout, containerId));
     }
 
@@ -114,7 +128,7 @@ public class DockerExecutor {
      * 删除容器
      */
     public static ExecuteResult removeContainer(String containerId, boolean force)
-            throws IOException {
+        throws IOException {
         String cmd = force ?
             "docker rm -f " + containerId : "docker rm " + containerId;
         return execute(cmd);
@@ -124,8 +138,8 @@ public class DockerExecutor {
      * 运行新容器
      */
     public static ExecuteResult runContainer(String image, String containerName,
-            Map<String, String> portMappings, Map<String, String> envVars)
-            throws IOException {
+                                             Map<String, String> portMappings, Map<String, String> envVars)
+        throws IOException {
         StringBuilder cmd = new StringBuilder("docker run -d");
 
         if (containerName != null && !containerName.isEmpty()) {
@@ -135,14 +149,14 @@ public class DockerExecutor {
         if (portMappings != null) {
             for (Map.Entry<String, String> entry : portMappings.entrySet()) {
                 cmd.append(" -p ").append(entry.getKey())
-                   .append(":").append(entry.getValue());
+                    .append(":").append(entry.getValue());
             }
         }
 
         if (envVars != null) {
             for (Map.Entry<String, String> entry : envVars.entrySet()) {
                 cmd.append(" -e ").append(entry.getKey())
-                   .append("=").append(entry.getValue());
+                    .append("=").append(entry.getValue());
             }
         }
 
@@ -154,7 +168,7 @@ public class DockerExecutor {
      * 在容器中执行命令
      */
     public static ExecuteResult execInContainer(String containerId, String command)
-            throws IOException {
+        throws IOException {
         return execute(String.format("docker exec %s %s", containerId, command));
     }
 
@@ -162,7 +176,7 @@ public class DockerExecutor {
      * 查看容器日志
      */
     public static ExecuteResult getLogs(String containerId, int tailLines)
-            throws IOException {
+        throws IOException {
         String cmd = tailLines > 0 ?
             String.format("docker logs --tail %d %s", tailLines, containerId) :
             "docker logs " + containerId;
@@ -187,7 +201,7 @@ public class DockerExecutor {
      * 删除镜像
      */
     public static ExecuteResult removeImage(String imageId, boolean force)
-            throws IOException {
+        throws IOException {
         String cmd = force ?
             "docker rmi -f " + imageId : "docker rmi " + imageId;
         return execute(cmd);
@@ -197,7 +211,7 @@ public class DockerExecutor {
      * 构建镜像
      */
     public static ExecuteResult buildImage(String dockerfilePath, String tag)
-            throws IOException {
+        throws IOException {
         String cmd = String.format("docker build -t %s %s", tag, dockerfilePath);
         return execute(cmd, 600); // 10分钟超时
     }
@@ -219,7 +233,7 @@ public class DockerExecutor {
      * 获取容器详细信息
      */
     public static ExecuteResult inspectContainer(String containerId)
-            throws IOException {
+        throws IOException {
         return execute("docker inspect " + containerId);
     }
 
@@ -227,7 +241,7 @@ public class DockerExecutor {
      * 核心执行方法
      */
     private static ExecuteResult executeCommand(CommandLine cmdLine, int timeoutSeconds)
-            throws IOException {
+        throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
 
@@ -306,8 +320,9 @@ public class DockerExecutor {
 
     /**
      * 根据PID获取进程名称
+     *
      * @param containerId 容器ID
-     * @param pid 进程ID
+     * @param pid         进程ID
      * @return 进程名称，如果未找到返回null
      */
     public static String getProcessNameByPid(String containerId, int pid)
@@ -330,7 +345,7 @@ public class DockerExecutor {
      * 从InputStream导入Docker镜像（docker load）
      * 通常用于将镜像.tar文件加载到本地镜像列表中
      *
-     * @param inputStream 镜像文件输入流（通常是tar文件）
+     * @param inputStream    镜像文件输入流（通常是tar文件）
      * @param timeoutSeconds 超时时间（秒）
      * @return 执行结果
      * @throws IOException 加载失败时抛出
@@ -372,4 +387,31 @@ public class DockerExecutor {
 
         return new ExecuteResult(exitCode, output, error);
     }
+
+    public static DContainerInfo runContainerAndGetInfo(String imageName) throws IOException {
+        if (imageName == null || imageName.trim().isEmpty()) {
+            throw new IllegalArgumentException("镜像名不能为空");
+        }
+
+        // 自动生成唯一容器名称
+        String containerName = "container-" + UUID.randomUUID().toString().substring(0, 8);
+
+        String cmd = String.format("docker run -d --name %s %s", containerName, imageName);
+        ExecuteResult result = execute(cmd);
+
+        if (!result.isSuccess()) {
+            throw new IOException("容器启动失败: " + result.getError());
+        }
+
+        String containerId = result.getOutput().trim();
+
+        // 校验返回的容器ID是否合理（一般是12~64位十六进制字符串）
+        if (!containerId.matches("^[a-f0-9]{12,64}$")) {
+            throw new IOException("容器启动成功但无法解析容器ID: " + containerId);
+        }
+
+        logger.info("成功启动容器: ID={}, Name={}", containerId, containerName);
+        return new DContainerInfo(containerName, containerId);
+    }
+
 }

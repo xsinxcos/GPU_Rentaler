@@ -54,10 +54,10 @@ public class DockerImageController {
 
     @GetMapping("/me")
     @RequiresPermissions("dockerImage:me")
-    public ResponseEntity<PageDTO<StorageFileDTO>> getMyImage(Pageable page) throws IOException {
+    public ResponseEntity<PageDTO<StorageFileDTO>> getMyImage(Pageable page) {
         UserinfoDTO item = (UserinfoDTO) SessionItemHolder.getItem(Constants.SESSION_CURRENT_USER);
         String username = item.username();
-        PageDTO<StorageFileDTO> dto = storageService.getFileByCreateName(page, username);
+        PageDTO<StorageFileDTO> dto = storageService.getImageFileByCreateName(page, username);
         return ResponseEntity.ok(dto);
     }
 

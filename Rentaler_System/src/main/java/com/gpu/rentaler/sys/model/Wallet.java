@@ -7,7 +7,6 @@ import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.time.Instant;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "wallet", schema = "gpu_rentaler_0")

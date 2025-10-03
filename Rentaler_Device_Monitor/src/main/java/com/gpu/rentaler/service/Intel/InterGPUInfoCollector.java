@@ -1,7 +1,7 @@
 package com.gpu.rentaler.service.Intel;
 
-import com.gpu.rentaler.service.IGPUInfoCollector;
 import com.gpu.rentaler.entity.GPUDeviceInfo;
+import com.gpu.rentaler.service.IGPUInfoCollector;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
