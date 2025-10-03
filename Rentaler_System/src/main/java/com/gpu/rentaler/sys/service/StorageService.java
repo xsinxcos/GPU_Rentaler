@@ -2,8 +2,10 @@ package com.gpu.rentaler.sys.service;
 
 import com.gpu.rentaler.sys.model.StorageConfig;
 import com.gpu.rentaler.sys.model.StorageFile;
+import com.gpu.rentaler.sys.service.dto.PageDTO;
 import com.gpu.rentaler.sys.service.dto.StorageFileDTO;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Pageable;
 
 import java.io.InputStream;
 import java.util.List;
@@ -32,4 +34,6 @@ public interface StorageService {
     StorageFile getByKey(String key);
 
     Resource loadAsResource(String key);
+
+    PageDTO<StorageFileDTO> getFileByCreateName(Pageable pageable , String name);
 }

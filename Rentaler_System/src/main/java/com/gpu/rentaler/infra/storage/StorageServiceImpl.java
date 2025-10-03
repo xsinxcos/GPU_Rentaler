@@ -12,10 +12,13 @@ import com.gpu.rentaler.sys.model.StorageFile;
 import com.gpu.rentaler.sys.repository.StorageConfigRepository;
 import com.gpu.rentaler.sys.repository.StorageFileRepository;
 import com.gpu.rentaler.sys.service.StorageService;
+import com.gpu.rentaler.sys.service.dto.PageDTO;
 import com.gpu.rentaler.sys.service.dto.StorageFileDTO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -190,6 +193,17 @@ public class StorageServiceImpl implements StorageService {
         Storage storage = getStorage(file.getStorageId());
         InputStream is = storage.getFileContent(key);
         return new InputStreamResource(is);
+    }
+
+    @Override
+    public PageDTO<StorageFileDTO> getFileByCreateName(Pageable pageable ,String name) {
+        Page<StorageFile> storageFiles = storageFileRepository.findByCreateUser(name, pageable);
+        List<StorageFileDTO> dtos = storageFiles.get().map(item -> {
+            StorageFileDTO dto = new StorageFileDTO();
+            BeanUtils.copyProperties(item, dto);
+            return dto;
+        }).toList();
+        return new PageDTO<>(dtos ,storageFiles.getTotalElements());
     }
 
 }

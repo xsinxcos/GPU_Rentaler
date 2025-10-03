@@ -74,7 +74,7 @@ public class GPUDeviceController {
 
     @RequiresPermissions("gpu:lease")
     @PostMapping("/{deviceId}/lease")
-    public ResponseEntity<GPUDeviceCertificateDTO> leaseGPUDevice(HttpServletRequest request, @PathVariable String deviceId) {
+    public ResponseEntity<GPUDeviceCertificateDTO> leaseGPUDevice(HttpServletRequest request ,String storageId, @PathVariable String deviceId) {
         // 租用GPU设备的逻辑
         gpuDeviceService.leaseDevice(deviceId);
         GPUDevice device = gpuDeviceService.getByDeviceId(deviceId);

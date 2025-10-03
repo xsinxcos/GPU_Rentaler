@@ -7,4 +7,6 @@ public interface WalletRepository extends JpaRepository<Wallet, Long> {
     Wallet getWalletById(Long id);
 
     Wallet getWalletByUserId(Long userId);
+
+    boolean existsWalletByUserId(Long userId);
 }

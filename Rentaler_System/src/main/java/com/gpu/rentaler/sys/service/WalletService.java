@@ -7,6 +7,7 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 @Service
 public class WalletService {
@@ -15,7 +16,16 @@ public class WalletService {
     private WalletRepository walletRepository;
 
     public WalletDTO getWalletInfo(Long userId){
-        Wallet wallet = walletRepository.getWalletByUserId(userId);
+        boolean exist = walletRepository.existsWalletByUserId(userId);
+        Wallet wallet;
+        if(exist){
+           wallet = walletRepository.getWalletByUserId(userId);
+        }else {
+            wallet = new Wallet();
+            wallet.setUserId(userId);
+            wallet.setStatus(0);
+            wallet = walletRepository.save(wallet);
+        }
         return new WalletDTO(wallet.getId() ,wallet.getUserId() ,wallet.getBalance().toPlainString() ,wallet.getStatus() ,wallet.getLastTransactionTime());
     }
 

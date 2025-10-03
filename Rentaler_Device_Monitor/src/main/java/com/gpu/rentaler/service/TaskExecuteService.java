@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -55,5 +56,10 @@ public class TaskExecuteService implements TaskAssignService {
         } catch (IOException e) {
             log.error("Error stopping container {}: {}", containerId, e.getMessage());
         }
+    }
+
+    @Override
+    public void upDockerImage(InputStream inputStream) {
+
     }
 }

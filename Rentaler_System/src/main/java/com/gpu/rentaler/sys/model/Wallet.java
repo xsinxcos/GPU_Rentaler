@@ -1,10 +1,13 @@
 package com.gpu.rentaler.sys.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "wallet", schema = "gpu_rentaler_0")
@@ -12,13 +15,9 @@ public class Wallet extends BaseEntity {
 
     private Long userId;
 
-
     private BigDecimal balance;
 
-
     private Integer status;
-
-    private Instant createdAt;
 
     private Instant updatedAt;
 
@@ -26,6 +25,11 @@ public class Wallet extends BaseEntity {
 
     private String remark;
 
+    @PreUpdate
+    @PrePersist
+    protected void onCreate() {
+        this.updatedAt = Instant.now();
+    }
 
     public Long getUserId() {
         return userId;
@@ -47,16 +51,9 @@ public class Wallet extends BaseEntity {
         return status;
     }
 
+
     public void setStatus(Integer status) {
         this.status = status;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
     }
 
     public Instant getUpdatedAt() {

@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -323,5 +324,52 @@ public class DockerExecutor {
 
         logger.warn("未找到容器 {} 中PID为 {} 的进程", containerId, pid);
         return null;
+    }
+
+    /**
+     * 从InputStream导入Docker镜像（docker load）
+     * 通常用于将镜像.tar文件加载到本地镜像列表中
+     *
+     * @param inputStream 镜像文件输入流（通常是tar文件）
+     * @param timeoutSeconds 超时时间（秒）
+     * @return 执行结果
+     * @throws IOException 加载失败时抛出
+     */
+    public static ExecuteResult loadImageFromInputStream(InputStream inputStream, int timeoutSeconds)
+        throws IOException {
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+
+        CommandLine cmdLine = CommandLine.parse("docker load");
+
+        DefaultExecutor executor = new DefaultExecutor();
+        executor.setStreamHandler(new PumpStreamHandler(outputStream, errorStream, inputStream));
+
+        // 设置超时
+        ExecuteWatchdog watchdog = new ExecuteWatchdog(TimeUnit.SECONDS.toMillis(timeoutSeconds));
+        executor.setWatchdog(watchdog);
+
+        // 允许非0退出码
+        executor.setExitValues(null);
+
+        int exitCode;
+        try {
+            logger.debug("开始导入Docker镜像...");
+            exitCode = executor.execute(cmdLine);
+        } catch (ExecuteException e) {
+            exitCode = e.getExitValue();
+            logger.warn("docker load 执行失败，退出码: {}", exitCode);
+        }
+
+        String output = outputStream.toString().trim();
+        String error = errorStream.toString().trim();
+
+        if (watchdog.killedProcess()) {
+            error = "导入超时 (" + timeoutSeconds + "秒)";
+            logger.error(error);
+        }
+
+        return new ExecuteResult(exitCode, output, error);
     }
 }
