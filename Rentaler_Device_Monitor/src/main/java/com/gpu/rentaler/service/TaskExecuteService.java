@@ -4,7 +4,7 @@ import com.gpu.rentaler.TaskAssignService;
 import com.gpu.rentaler.config.DockerFileLocation;
 import com.gpu.rentaler.constant.GPUType;
 import com.gpu.rentaler.entity.ContainerInfo;
-import com.gpu.rentaler.entity.DockerCreateResInfo;
+import com.gpu.rentaler.entity.VirtulBoxResInfo;
 import com.gpu.rentaler.utils.DockerExecutor;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.apache.logging.log4j.LogManager;
@@ -22,14 +22,14 @@ public class TaskExecuteService implements TaskAssignService {
     private static final Logger log = LogManager.getLogger(TaskExecuteService.class);
 
     @Override
-    public DockerCreateResInfo createDockerContainer(String gpuType) {
+    public VirtulBoxResInfo createVirtulBox(String gpuType) {
         DockerComposeExecutor executor = null;
         if (GPUType.NVIDIA.equals(gpuType)) {
             executor = new DockerComposeExecutor(DockerFileLocation.NVIDIA_DOCKER);
         } else if (GPUType.AMD.equals(gpuType)) {
             executor = new DockerComposeExecutor(DockerFileLocation.AMD_DOCKER);
         }
-        DockerCreateResInfo createResInfo = new DockerCreateResInfo();
+        VirtulBoxResInfo createResInfo = new VirtulBoxResInfo();
         Optional.ofNullable(executor).ifPresent(item -> {
             String secret = UUID.randomUUID().toString();
             item.addEnvironmentVariable("SSH_USER", "root");

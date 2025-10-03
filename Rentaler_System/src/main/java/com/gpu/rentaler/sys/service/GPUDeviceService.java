@@ -76,12 +76,12 @@ public class GPUDeviceService {
         }
     }
 
-    public GPUDevice getById(Long gpuDeviceId) {
-        return gpuDeviceRepository.findById(gpuDeviceId).orElse(null);
+    public GPUDevice getByDeviceId(String deviceId) {
+        return gpuDeviceRepository.findByDeviceId(deviceId).getFirst();
     }
 
-    public List<GPUDevice> getById(List<Long> gpuDeviceIds) {
-        return gpuDeviceRepository.findAllById(gpuDeviceIds);
+    public List<GPUDevice> getById(List<Long> ids) {
+        return gpuDeviceRepository.findAllById(ids);
     }
 
     public void deleteByDeviceId(String deviceId) {
@@ -138,5 +138,9 @@ public class GPUDeviceService {
 
     public void returnDevice(String deviceId) {
         gpuDeviceRepository.updateIsRentableByDeviceId(true ,deviceId);
+    }
+
+    public List<GPUDevice> getByDeviceIds(List<String> deviceIds) {
+        return gpuDeviceRepository.findByDeviceIdIn(deviceIds);
     }
 }

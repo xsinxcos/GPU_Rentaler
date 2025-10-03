@@ -47,7 +47,7 @@ public class NvidiaActivityFetcher implements GPUActivityFetcher {
         try {
             executor.execute(cmdLine);
         } catch (IOException e) {
-            log.info("获取NVIDIA GPU进程信息失败: {}", e.getMessage());
+            log.info("获取NVIDIA GPU进程信息失败: {} docker containerId :{}", e.getMessage() ,containerId);
             return List.of();
         }
         String result = outputStream.toString().trim();

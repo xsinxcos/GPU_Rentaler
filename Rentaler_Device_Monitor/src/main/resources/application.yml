@@ -38,3 +38,6 @@ app:
         file-path: data/app-uuid.dat
         # 文件编码格式，默认UTF-8
         file-charset: UTF-8
+    super-ssh-user:
+        name: ${ssh_username:root}
+        pwd:  ${ssh_userpwd:123456}

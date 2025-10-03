@@ -7,16 +7,22 @@ import com.gpu.rentaler.sys.event.UserUpdated;
 import com.gpu.rentaler.sys.exception.UserException;
 import com.gpu.rentaler.sys.model.Organization;
 import com.gpu.rentaler.sys.model.User;
+import com.gpu.rentaler.sys.model.UserCredential;
+import com.gpu.rentaler.sys.repository.UserCredentialRepository;
 import com.gpu.rentaler.sys.repository.UserRepository;
 import com.gpu.rentaler.sys.service.dto.OrgUserDTO;
 import com.gpu.rentaler.sys.service.dto.PageDTO;
 import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
+import jakarta.validation.constraints.NotBlank;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.Set;
@@ -30,10 +36,14 @@ import static com.gpu.rentaler.common.CommonResultStatus.RECORD_NOT_EXIST;
 @Service
 public class UserService {
 
+    private static final Logger log = LogManager.getLogger(UserService.class);
     private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    private final UserCredentialRepository userCredentialRepository;
+
+    public UserService(UserRepository userRepository, UserCredentialRepository userCredentialRepository) {
         this.userRepository = userRepository;
+        this.userCredentialRepository = userCredentialRepository;
     }
 
     @Transactional
@@ -112,5 +122,29 @@ public class UserService {
         User user = findUserById(userId);
         userRepository.delete(user);
         DomainEventPublisher.instance().publish(new UserDeleted(user));
+    }
+
+    public User register(String username,String password) {
+        try {
+            User user = new User();
+            user.setGender(User.Gender.MALE);
+            user.setUsername(username);
+            user.setState(User.State.NORMAL);
+
+            UserCredential credential = new UserCredential();
+            credential.setIdentifier(username);
+            credential.setUser(user);
+            credential.setIdentityType(UserCredential.IdentityType.PASSWORD);
+            credential.setCredential(SecurityUtil.md5(user.getUsername() ,password));
+
+            user.setCredentials(Set.of(credential));
+
+            userRepository.save(user);
+
+            return user;
+        } catch (NoSuchAlgorithmException e) {
+            log.error("e: {}" ,e.getMessage());
+        }
+        return null;
     }
 }

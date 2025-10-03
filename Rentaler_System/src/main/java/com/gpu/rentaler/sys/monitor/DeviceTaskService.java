@@ -3,7 +3,7 @@ package com.gpu.rentaler.sys.monitor;
 import com.gpu.rentaler.TaskAssignService;
 import com.gpu.rentaler.common.JsonUtils;
 import com.gpu.rentaler.constant.GPUType;
-import com.gpu.rentaler.entity.DockerCreateResInfo;
+import com.gpu.rentaler.entity.VirtulBoxResInfo;
 import com.gpu.rentaler.infra.service.DubboDynamicInvoker;
 import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.model.Server;
@@ -25,9 +25,9 @@ public class DeviceTaskService {
     @Resource
     private DubboDynamicInvoker dubboDynamicInvoker;
 
-    public DockerCreateResInfo createDockerContainer(Long serverId, List<Long> gpuIds) {
+    public VirtulBoxResInfo createDockerContainer(Long serverId, List<String> deviceIds) {
         Server server = serverService.getById(serverId);
-        List<GPUDevice> devices = gpuDeviceService.getById(gpuIds);
+        List<GPUDevice> devices = gpuDeviceService.getByDeviceIds(deviceIds);
         if (!devices.isEmpty()) {
             GPUDevice first = devices.getFirst();
             String brand = first.getBrand();
@@ -35,13 +35,17 @@ public class DeviceTaskService {
             int port = 20880;
 
             TaskAssignService myService = dubboDynamicInvoker.getService(TaskAssignService.class, "1.0.0", ip, port ,30000);
+            VirtulBoxResInfo dockerContainer = null;
             if (GPUType.NVIDIA.equalsIgnoreCase(brand)) {
-                DockerCreateResInfo dockerContainer = myService.createDockerContainer(GPUType.NVIDIA);
+                dockerContainer = myService.createVirtulBox(GPUType.NVIDIA);
+                dockerContainer.setIp(ip);
                 System.out.println("调用结果: " + JsonUtils.stringify(dockerContainer));
             } else if (GPUType.AMD.equalsIgnoreCase(brand)) {
-                DockerCreateResInfo dockerContainer = myService.createDockerContainer(GPUType.AMD);
+                dockerContainer = myService.createVirtulBox(GPUType.AMD);
+                dockerContainer.setIp(ip);
                 System.out.println("调用结果: " + JsonUtils.stringify(dockerContainer));
             }
+            return dockerContainer;
         }
         return null;
     }

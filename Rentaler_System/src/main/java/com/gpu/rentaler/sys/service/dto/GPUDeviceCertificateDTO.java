@@ -4,6 +4,6 @@ public record GPUDeviceCertificateDTO (
     String deviceId,
     String sshUsername,
     String sshPassword,
-    String sshIp
+    String sshHost
 ){
 }

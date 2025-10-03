@@ -2,20 +2,23 @@ package com.gpu.rentaler.entity;
 
 import java.io.Serializable;
 
-public class DockerCreateResInfo implements Serializable {
+public class VirtulBoxResInfo implements Serializable {
     private String containerId;
+    private String ip;
     private String port;
     private String sshName;
     private String sshPassword;
 
-    public DockerCreateResInfo(String containerId, String port, String sshName, String sshPassword) {
+
+    public VirtulBoxResInfo() {
+    }
+
+    public VirtulBoxResInfo(String containerId, String ip, String port, String sshName, String sshPassword) {
         this.containerId = containerId;
+        this.ip = ip;
         this.port = port;
         this.sshName = sshName;
         this.sshPassword = sshPassword;
-    }
-
-    public DockerCreateResInfo() {
     }
 
     public String getContainerId() {
@@ -48,5 +51,13 @@ public class DockerCreateResInfo implements Serializable {
 
     public void setSshPassword(String sshPassword) {
         this.sshPassword = sshPassword;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
     }
 }

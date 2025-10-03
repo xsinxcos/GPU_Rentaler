@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface GPUDeviceRepository extends JpaRepository<GPUDevice, Long> {
@@ -33,4 +34,7 @@ public interface GPUDeviceRepository extends JpaRepository<GPUDevice, Long> {
     @Modifying
     @Query("update GPUDevice g set g.isRentable = ?1 where g.deviceId = ?2")
     int updateIsRentableByDeviceId(Boolean isRentable, String deviceId);
+
+    @Query("select g from GPUDevice g where g.deviceId in ?1")
+    List<GPUDevice> findByDeviceIdIn(Collection<String> deviceIds);
 }

@@ -1,14 +1,21 @@
-version: "3.9"
 services:
-    amd-container:
+    nvidia-container:
+        image: virtual-box
         build:
             context: .
-            dockerfile: Dockerfile
+            args:
+                USERNAME: ${USERNAME:-root}
+                USER_PASSWORD: ${USER_PASSWORD:-123456}
         environment:
-            - USER_PASSWORD=${SSH_PASSWORD}
+            - USERNAME=${USERNAME:-root}  # 默认为root
+            - USER_PASSWORD=${USER_PASSWORD:-123456}  # 默认为123456
+            - NVIDIA_VISIBLE_DEVICES=all
+            - NVIDIA_DRIVER_CAPABILITIES=compute,utility
         runtime: runc
-        devices:
-            - /dev/kfd
-            - /dev/dri
+        deploy:
+            resources:
+                reservations:
+                    devices:
+                        - capabilities: [gpu]
         ports:
-            - "2223:22"
+            - "2224:22"

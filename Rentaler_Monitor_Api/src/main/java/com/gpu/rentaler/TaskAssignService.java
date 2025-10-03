@@ -1,10 +1,10 @@
 package com.gpu.rentaler;
 
 
-import com.gpu.rentaler.entity.DockerCreateResInfo;
+import com.gpu.rentaler.entity.VirtulBoxResInfo;
 
 public interface TaskAssignService {
-    DockerCreateResInfo createDockerContainer(String gouType);
+    VirtulBoxResInfo createVirtulBox(String gouType);
 
     void stopDockerContainer(String containerId);
 }

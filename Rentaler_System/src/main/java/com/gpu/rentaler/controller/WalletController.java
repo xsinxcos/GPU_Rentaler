@@ -48,7 +48,7 @@ public class WalletController {
 //    }
 
 
-    @RequiresPermissions("wallet:sandbox:recharge")
+    @RequiresPermissions("sandbox:wallet:recharge")
     @PostMapping("/sandbox/recharge")
     public ResponseEntity<Void> rechargeSandbox(HttpServletRequest request , @RequestBody ChargeSandboxRequest chargeSandboxRequest) {
         String token = request.getHeader("Authorization").replace("Bearer", "").trim();

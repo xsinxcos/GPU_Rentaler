@@ -2,15 +2,25 @@ package com.gpu.rentaler.controller;
 
 
 import com.gpu.rentaler.common.authz.RequiresPermissions;
+import com.gpu.rentaler.entity.VirtulBoxResInfo;
+import com.gpu.rentaler.sys.constant.RantalStatus;
+import com.gpu.rentaler.sys.model.GPUDevice;
+import com.gpu.rentaler.sys.model.GPURantals;
+import com.gpu.rentaler.sys.monitor.DeviceTaskService;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
+import com.gpu.rentaler.sys.service.GPURantalsService;
+import com.gpu.rentaler.sys.service.SessionService;
 import com.gpu.rentaler.sys.service.dto.*;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 
 @RestController
 @SecurityRequirement(name = "bearerAuth")
@@ -18,6 +28,15 @@ import java.util.ArrayList;
 public class GPUDeviceController {
     @Resource
     private GPUDeviceService gpuDeviceService;
+
+    @Resource
+    private GPURantalsService gpuRantalsService;
+
+    @Resource
+    private SessionService sessionService;
+
+    @Resource
+    private DeviceTaskService deviceTaskService;
 
     @RequiresPermissions("gpu:release")
     @DeleteMapping("/{deviceId}/release")
@@ -55,11 +74,21 @@ public class GPUDeviceController {
 
     @RequiresPermissions("gpu:lease")
     @PostMapping("/{deviceId}/lease")
-    public ResponseEntity<GPUDeviceCertificateDTO> leaseGPUDevice(@PathVariable String deviceId) {
+    public ResponseEntity<GPUDeviceCertificateDTO> leaseGPUDevice(HttpServletRequest request, @PathVariable String deviceId) {
         // 租用GPU设备的逻辑
         gpuDeviceService.leaseDevice(deviceId);
-        // todo 生成租借表
-        return ResponseEntity.ok(new GPUDeviceCertificateDTO("1", "test", "test", "127.0.0.1:2222"));
+        GPUDevice device = gpuDeviceService.getByDeviceId(deviceId);
+
+        String token = request.getHeader("Authorization").replace("Bearer", "").trim();
+        UserinfoDTO userInfo = sessionService.getLoginUserInfo(token);
+
+        VirtulBoxResInfo container = deviceTaskService.createDockerContainer(device.getServerId(), List.of(deviceId));
+
+        GPURantals rantals = gpuRantalsService.saveGPURental(deviceId, userInfo.userId(), Instant.now(), device.getHourlyRate(), RantalStatus.ACTIVE,
+            container.getContainerId(), container.getIp() + ":" + container.getPort(), container.getSshName(), container.getSshPassword());
+
+        GPUDeviceCertificateDTO dto = new GPUDeviceCertificateDTO(deviceId, rantals.getSshUsername(), rantals.getSshPassword(), rantals.getSshHost());
+        return ResponseEntity.ok(dto);
     }
 
     @RequiresPermissions("gpu:return")
@@ -79,12 +108,4 @@ public class GPUDeviceController {
         return ResponseEntity.ok(new PageDTO<>(new ArrayList<>(), 0));
     }
 
-
-    @RequiresPermissions("gpu:alllease")
-    @GetMapping("/alllease")
-    public ResponseEntity<PageDTO<GPURantalDTO>> findAllLeaseGPUDevices(Pageable pageable) {
-        //todo
-        // 获取所有租用的GPU设备的逻辑
-        return ResponseEntity.ok(new PageDTO<>(new ArrayList<>(), 0));
-    }
 }

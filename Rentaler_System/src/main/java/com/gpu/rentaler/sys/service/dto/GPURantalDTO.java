@@ -15,6 +15,7 @@ public record GPURantalDTO(
     String hourlyRate,
     String status,
     String sshIp,
+    String sshPort,
     String sshUsername,
     String sshPassword
 ) {

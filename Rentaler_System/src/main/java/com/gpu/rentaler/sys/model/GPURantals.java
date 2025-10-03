@@ -14,7 +14,7 @@ public class GPURantals extends BaseEntity{
 
     private Long userId;
 
-    private Long gpuDeviceId;
+    private String deviceId;
 
     private Instant startTime;
 
@@ -32,7 +32,7 @@ public class GPURantals extends BaseEntity{
 
     private String containerId;
 
-    private Integer sshIp;
+    private String sshHost;
 
     private String sshUsername;
 
@@ -44,14 +44,6 @@ public class GPURantals extends BaseEntity{
 
     public void setUserId(Long userId) {
         this.userId = userId;
-    }
-
-    public Long getGpuDeviceId() {
-        return gpuDeviceId;
-    }
-
-    public void setGpuDeviceId(Long gpuDeviceId) {
-        this.gpuDeviceId = gpuDeviceId;
     }
 
     public Instant getStartTime() {
@@ -127,19 +119,27 @@ public class GPURantals extends BaseEntity{
         this.sshUsername = sshUsername;
     }
 
-    public Integer getSshIp() {
-        return sshIp;
-    }
-
-    public void setSshIp(Integer sshIp) {
-        this.sshIp = sshIp;
-    }
-
     public String getSshPassword() {
         return sshPassword;
     }
 
     public void setSshPassword(String sshPassword) {
         this.sshPassword = sshPassword;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public String getSshHost() {
+        return sshHost;
+    }
+
+    public void setSshHost(String sshHost) {
+        this.sshHost = sshHost;
     }
 }

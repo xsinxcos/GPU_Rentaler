@@ -1,6 +1,9 @@
 package com.gpu.rentaler.controller;
 
+import com.gpu.rentaler.sys.model.User;
+import com.gpu.rentaler.sys.service.RoleService;
 import com.gpu.rentaler.sys.service.SessionService;
+import com.gpu.rentaler.sys.service.UserService;
 import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author cjbi
  */
@@ -20,8 +26,14 @@ public class LoginController {
 
     private final SessionService sessionService;
 
-    public LoginController(SessionService sessionService) {
+    private final UserService userService;
+
+    private final RoleService roleService;
+
+    public LoginController(SessionService sessionService, UserService userService, RoleService roleService) {
         this.sessionService = sessionService;
+        this.userService = userService;
+        this.roleService = roleService;
     }
 
     @PostMapping("/login")
@@ -44,8 +56,19 @@ public class LoginController {
         return ResponseEntity.ok(sessionService.getLoginUserInfo(token));
     }
 
-    record LoginRequest(@NotBlank String username, @NotBlank String password) {
+    @PostMapping("/registry")
+    private ResponseEntity<Void> register(@RequestBody @Valid RegisterRequest request) {
+        User register = userService.register(request.username, request.password);
+        Set<User> users = new HashSet<>();
+        users.add(register);
+        roleService.changeUsers(3L , users);
+
+        return ResponseEntity.ok().build();
     }
 
 
+    record LoginRequest(@NotBlank String username, @NotBlank String password) {
+    }
+
+    record RegisterRequest(@NotBlank String username, @NotBlank String password){}
 }
