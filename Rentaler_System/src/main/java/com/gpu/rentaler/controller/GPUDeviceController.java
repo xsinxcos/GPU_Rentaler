@@ -1,30 +1,42 @@
 package com.gpu.rentaler.controller;
 
 
+import com.gpu.rentaler.common.Constants;
+import com.gpu.rentaler.common.SessionItemHolder;
 import com.gpu.rentaler.common.authz.RequiresPermissions;
-import com.gpu.rentaler.entity.VirtulBoxResInfo;
+import com.gpu.rentaler.entity.DContainerInfoResp;
 import com.gpu.rentaler.sys.constant.RantalStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
-import com.gpu.rentaler.sys.model.GPURantals;
+import com.gpu.rentaler.sys.model.StorageFile;
 import com.gpu.rentaler.sys.monitor.DeviceTaskService;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
 import com.gpu.rentaler.sys.service.GPURantalsService;
-import com.gpu.rentaler.sys.service.SessionService;
-import com.gpu.rentaler.sys.service.dto.*;
+import com.gpu.rentaler.sys.service.StorageService;
+import com.gpu.rentaler.sys.service.dto.GPUDeviceDTO;
+import com.gpu.rentaler.sys.service.dto.PageDTO;
+import com.gpu.rentaler.sys.service.dto.RentableGPUDeviceDTO;
+import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @SecurityRequirement(name = "bearerAuth")
 @RequestMapping("/gpu")
 public class GPUDeviceController {
+    private static final Logger log = LogManager.getLogger(GPUDeviceController.class);
     @Resource
     private GPUDeviceService gpuDeviceService;
 
@@ -32,10 +44,10 @@ public class GPUDeviceController {
     private GPURantalsService gpuRantalsService;
 
     @Resource
-    private SessionService sessionService;
+    private DeviceTaskService deviceTaskService;
 
     @Resource
-    private DeviceTaskService deviceTaskService;
+    private StorageService storageService;
 
     @RequiresPermissions("gpu:release")
     @DeleteMapping("/{deviceId}/release")
@@ -73,21 +85,39 @@ public class GPUDeviceController {
 
     @RequiresPermissions("gpu:lease")
     @PostMapping("/{deviceId}/lease")
-    public ResponseEntity<GPUDeviceCertificateDTO> leaseGPUDevice(HttpServletRequest request ,String storageId, @PathVariable String deviceId) {
+    public ResponseEntity<LeaseGPUDeviceDTO> leaseGPUDevice(String key, @PathVariable String deviceId) {
         // 租用GPU设备的逻辑
-        gpuDeviceService.leaseDevice(deviceId);
-        GPUDevice device = gpuDeviceService.getByDeviceId(deviceId);
+        Optional<GPUDevice> lease = gpuDeviceService.lease(deviceId);
+        final LeaseGPUDeviceDTO[] dto = new LeaseGPUDeviceDTO[1];
+        lease.ifPresentOrElse(device -> {
+            UserinfoDTO userInfo = (UserinfoDTO) SessionItemHolder.getItem(Constants.SESSION_CURRENT_USER);
+            asyncExecute(() -> {
+                org.springframework.core.io.Resource resource = storageService.loadAsResource(key);
+                try {
+                    InputStream inputStream = resource.getInputStream();
+                    List<String> devices = new ArrayList<>();
+                    devices.add(deviceId);
+                    DContainerInfoResp infoResp = deviceTaskService.exportAndUpDockerImage(
+                        inputStream, device.getServerId(), devices);
+                    gpuRantalsService.saveGPURental(deviceId, userInfo.userId(), Instant.now(), device.getHourlyRate(), RantalStatus.ACTIVE,
+                        infoResp.containerId(), infoResp.containerName());
+                } catch (IOException e) {
+                    log.warn("{} 镜像运行失败：{}", resource.getFilename(), e.getMessage());
+                }
+            });
+            dto[0] = new LeaseGPUDeviceDTO(true, "成功租用");
+        }, () -> {
+            dto[0] = new LeaseGPUDeviceDTO(false, "已被租用，请重新选择设备");
+        });
+        return ResponseEntity.ok(dto[0]);
+    }
 
-        String token = request.getHeader("Authorization").replace("Bearer", "").trim();
-        UserinfoDTO userInfo = sessionService.getLoginUserInfo(token);
+    @Async("IOTaskExecutor")
+    protected void asyncExecute(Runnable task) {
+        task.run();
+    }
 
-        VirtulBoxResInfo container = deviceTaskService.createDockerContainer(device.getServerId(), List.of(deviceId));
-
-        GPURantals rantals = gpuRantalsService.saveGPURental(deviceId, userInfo.userId(), Instant.now(), device.getHourlyRate(), RantalStatus.ACTIVE,
-            container.getContainerId(), container.getIp() + ":" + container.getPort(), container.getSshName(), container.getSshPassword());
-
-        GPUDeviceCertificateDTO dto = new GPUDeviceCertificateDTO(deviceId, rantals.getSshUsername(), rantals.getSshPassword(), rantals.getSshHost());
-        return ResponseEntity.ok(dto);
+    public record LeaseGPUDeviceDTO(boolean isSuccess, String msg) {
     }
 
     @RequiresPermissions("gpu:return")

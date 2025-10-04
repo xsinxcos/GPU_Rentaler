@@ -4,6 +4,7 @@ import com.gpu.rentaler.entity.GPUDeviceInfo;
 import com.gpu.rentaler.sys.constant.DeviceStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.repository.GPUDeviceRepository;
+import com.gpu.rentaler.sys.repository.GPURantalsRepository;
 import com.gpu.rentaler.sys.service.dto.GPUDeviceDTO;
 import com.gpu.rentaler.sys.service.dto.PageDTO;
 import com.gpu.rentaler.sys.service.dto.RentableGPUDeviceDTO;
@@ -16,14 +17,18 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class GPUDeviceService {
     private final GPUDeviceRepository gpuDeviceRepository;
 
-    public GPUDeviceService(GPUDeviceRepository gpuDeviceRepository) {
+    private final GPURantalsRepository gpuRantalsRepository;
+
+    public GPUDeviceService(GPUDeviceRepository gpuDeviceRepository, GPURantalsRepository gpuRantalsRepository) {
         this.gpuDeviceRepository = gpuDeviceRepository;
+        this.gpuRantalsRepository = gpuRantalsRepository;
     }
 
     @Transactional
@@ -78,6 +83,19 @@ public class GPUDeviceService {
 
     public GPUDevice getByDeviceId(String deviceId) {
         return gpuDeviceRepository.findByDeviceId(deviceId).getFirst();
+    }
+
+
+    public Optional<GPUDevice> lease(String deviceId){
+        synchronized (this){
+            GPUDevice device = getByDeviceId(deviceId);
+            if(device.getIsRentable()){
+                device.setIsRentable(false);
+                //gpuDeviceRepository.save(device);
+                return Optional.of(device);
+            }
+        }
+        return Optional.empty();
     }
 
     public List<GPUDevice> getById(List<Long> ids) {

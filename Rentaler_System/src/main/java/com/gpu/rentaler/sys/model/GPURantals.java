@@ -30,11 +30,7 @@ public class GPURantals extends BaseEntity{
 
     private String containerId;
 
-    private String sshHost;
-
-    private String sshUsername;
-
-    private String sshPassword;
+    private String containerName;
 
     public Long getUserId() {
         return userId;
@@ -108,23 +104,6 @@ public class GPURantals extends BaseEntity{
         this.containerId = containerId;
     }
 
-
-    public String getSshUsername() {
-        return sshUsername;
-    }
-
-    public void setSshUsername(String sshUsername) {
-        this.sshUsername = sshUsername;
-    }
-
-    public String getSshPassword() {
-        return sshPassword;
-    }
-
-    public void setSshPassword(String sshPassword) {
-        this.sshPassword = sshPassword;
-    }
-
     public String getDeviceId() {
         return deviceId;
     }
@@ -133,11 +112,11 @@ public class GPURantals extends BaseEntity{
         this.deviceId = deviceId;
     }
 
-    public String getSshHost() {
-        return sshHost;
+    public String getContainerName() {
+        return containerName;
     }
 
-    public void setSshHost(String sshHost) {
-        this.sshHost = sshHost;
+    public void setContainerName(String containerName) {
+        this.containerName = containerName;
     }
 }

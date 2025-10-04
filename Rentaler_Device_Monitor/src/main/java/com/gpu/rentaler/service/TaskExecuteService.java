@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -61,13 +62,13 @@ public class TaskExecuteService implements TaskAssignService {
     }
 
     @Override
-    public DContainerInfoResp upDockerImage(InputStream inputStream, String imageName) {
+    public DContainerInfoResp upDockerImage(InputStream inputStream, List<Integer> deviceIndexs) {
         try {
-            DockerExecutor.loadImageFromInputStream(inputStream, 300);
-            DContainerInfo dContainerInfo = DockerExecutor.runContainerAndGetInfo(imageName);
+            String imageName = DockerExecutor.loadImageFromInputStream(inputStream);
+            DContainerInfo dContainerInfo = DockerExecutor.runContainerAndGetInfo(imageName ,deviceIndexs);
             return new DContainerInfoResp(dContainerInfo.containerName(), dContainerInfo.containerId());
         } catch (IOException e) {
-            log.warn(" {} 镜像导入失败：{}", imageName, e.getMessage());
+            log.warn(" 镜像导入失败：{}", e.getMessage());
         }
         return new DContainerInfoResp(null, null);
     }

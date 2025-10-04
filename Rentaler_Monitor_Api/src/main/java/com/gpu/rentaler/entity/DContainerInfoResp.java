@@ -1,7 +1,9 @@
 package com.gpu.rentaler.entity;
 
-public record DContainerInfoResp(
+import java.io.Serializable;
+
+public record DContainerInfoResp (
     String containerName,
     String containerId
-) {
+) implements Serializable {
 }

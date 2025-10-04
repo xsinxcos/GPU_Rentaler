@@ -5,13 +5,14 @@ import org.apache.commons.exec.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Docker命令执行工具类
@@ -279,43 +280,22 @@ public class DockerExecutor {
     /**
      * 使用示例
      */
-    public static void main(String[] args) {
-        try {
-            // 检查Docker是否可用
-            if (!isDockerAvailable()) {
-                System.out.println("Docker不可用，请检查Docker是否已安装并启动");
-                return;
-            }
+    public static void main(String[] args) throws IOException, URISyntaxException {
+        File file = new File("D:/Project/GPU_Rentaler_0/files/6g676_2048.tar");
+        InputStream inputStream = new FileInputStream(file);
 
-            // 列出所有容器
-            ExecuteResult result = listContainers(true);
-            System.out.println("所有容器列表:");
-            System.out.println(result.getOutput());
+        loadImageFromInputStream(inputStream);
 
-            // 获取所有容器ID
-            java.util.List<String> containerIds = getAllContainerIds(true);
-            System.out.println("\n所有容器ID:");
-            for (String id : containerIds) {
-                System.out.println("  - " + id);
-            }
-
-            // 运行一个Nginx容器
-            Map<String, String> ports = new HashMap<>();
-            ports.put("8080", "80");
-
-            Map<String, String> env = new HashMap<>();
-            env.put("ENV", "production");
-
-            result = runContainer("nginx:latest", "my-nginx", ports, env);
-            if (result.isSuccess()) {
-                System.out.println("容器创建成功: " + result.getOutput());
-            } else {
-                System.out.println("容器创建失败: " + result.getError());
-            }
-
-        } catch (IOException e) {
-            logger.error("执行Docker命令失败", e);
-        }
+        inputStream.close();
+//        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+//        CommandLine cmdLine = CommandLine.parse("docker load -i " + );
+//        DefaultExecutor executor = new DefaultExecutor();
+//        executor.setStreamHandler(new PumpStreamHandler(outputStream));
+//        executor.setExitValues(null);
+//        executor.execute(cmdLine);
+//
+//        String output = outputStream.toString().trim();
+//        System.out.println(output);
     }
 
     /**
@@ -346,49 +326,64 @@ public class DockerExecutor {
      * 通常用于将镜像.tar文件加载到本地镜像列表中
      *
      * @param inputStream    镜像文件输入流（通常是tar文件）
-     * @param timeoutSeconds 超时时间（秒）
      * @return 执行结果
      * @throws IOException 加载失败时抛出
      */
-    public static ExecuteResult loadImageFromInputStream(InputStream inputStream, int timeoutSeconds)
-        throws IOException {
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
-
-        CommandLine cmdLine = CommandLine.parse("docker load");
-
-        DefaultExecutor executor = new DefaultExecutor();
-        executor.setStreamHandler(new PumpStreamHandler(outputStream, errorStream, inputStream));
-
-        // 设置超时
-        ExecuteWatchdog watchdog = new ExecuteWatchdog(TimeUnit.SECONDS.toMillis(timeoutSeconds));
-        executor.setWatchdog(watchdog);
-
-        // 允许非0退出码
-        executor.setExitValues(null);
-
-        int exitCode;
+    public static String loadImageFromInputStream(InputStream inputStream) throws IOException {
+        File file = writeToTempFile(inputStream, "temp-", ".tar");
         try {
-            logger.debug("开始导入Docker镜像...");
-            exitCode = executor.execute(cmdLine);
-        } catch (ExecuteException e) {
-            exitCode = e.getExitValue();
-            logger.warn("docker load 执行失败，退出码: {}", exitCode);
+            // 2. 创建临时文件
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
+
+            CommandLine cmdLine = CommandLine.parse("docker load -i " + file.getAbsolutePath());
+
+            DefaultExecutor executor = new DefaultExecutor();
+            executor.setStreamHandler(new PumpStreamHandler(outputStream, errorStream, inputStream));
+
+            executor.setExitValues(null);
+
+            int exitCode;
+            try {
+                logger.debug("开始导入Docker镜像...");
+                executor.execute(cmdLine);
+            } catch (ExecuteException e) {
+                exitCode = e.getExitValue();
+                logger.warn("docker load 执行失败，退出码: {}", exitCode);
+            }
+
+            String output = outputStream.toString().trim();
+
+            // 解析镜像名
+            Pattern pattern = Pattern.compile("Loaded image:\\s*(.+)");
+            Matcher matcher = pattern.matcher(output);
+            if (matcher.find()) {
+                return matcher.group(1).trim(); // ✅ 提取镜像名
+            }
+
+            logger.warn("未能从输出中提取镜像名，原始输出: {}", output);
+            return null;
+        }finally {
+            file.delete();
         }
-
-        String output = outputStream.toString().trim();
-        String error = errorStream.toString().trim();
-
-        if (watchdog.killedProcess()) {
-            error = "导入超时 (" + timeoutSeconds + "秒)";
-            logger.error(error);
-        }
-
-        return new ExecuteResult(exitCode, output, error);
     }
 
-    public static DContainerInfo runContainerAndGetInfo(String imageName) throws IOException {
+    public static File writeToTempFile(InputStream inputStream, String prefix, String suffix) throws IOException {
+        // 创建临时文件
+        File tempFile = File.createTempFile(prefix, suffix);
+
+        try (FileOutputStream fos = new FileOutputStream(tempFile)) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                fos.write(buffer, 0, bytesRead);
+            }
+        }
+
+        return tempFile;
+    }
+
+    public static DContainerInfo runContainerAndGetInfo(String imageName, List<Integer> gpuIndexes) throws IOException {
         if (imageName == null || imageName.trim().isEmpty()) {
             throw new IllegalArgumentException("镜像名不能为空");
         }
@@ -396,7 +391,26 @@ public class DockerExecutor {
         // 自动生成唯一容器名称
         String containerName = "container-" + UUID.randomUUID().toString().substring(0, 8);
 
-        String cmd = String.format("docker run -d --name %s %s", containerName, imageName);
+        // 构建 docker run 命令
+        StringBuilder cmdBuilder = new StringBuilder("docker run -d --name ");
+        cmdBuilder.append(containerName).append(" ");
+
+        // 处理 GPU 参数
+        if (gpuIndexes != null && !gpuIndexes.isEmpty()) {
+            for (Integer index : gpuIndexes) {
+                if (index == null || index < 0) {
+                    throw new IllegalArgumentException("GPU索引不能为 null 或负数");
+                }
+            }
+            String joinedIndexes = gpuIndexes.stream()
+                .map(String::valueOf)
+                .collect(Collectors.joining(","));
+            cmdBuilder.append("--gpus \"device=").append(joinedIndexes).append("\" ");
+        }
+
+        cmdBuilder.append(imageName);
+
+        String cmd = cmdBuilder.toString();
         ExecuteResult result = execute(cmd);
 
         if (!result.isSuccess()) {
@@ -410,8 +424,9 @@ public class DockerExecutor {
             throw new IOException("容器启动成功但无法解析容器ID: " + containerId);
         }
 
-        logger.info("成功启动容器: ID={}, Name={}", containerId, containerName);
+        logger.info("成功启动容器: ID={}, Name={}, GPUs={}", containerId, containerName, gpuIndexes);
         return new DContainerInfo(containerName, containerId);
     }
+
 
 }

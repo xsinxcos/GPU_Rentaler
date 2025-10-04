@@ -77,7 +77,7 @@ public class GPUMonitorService implements MonitorService {
         });
     }
 
-    @Async("monitorTaskExecutor")
+    @Async("IOTaskExecutor")
     protected void asyncExecute(Runnable task) {
         task.run();
     }

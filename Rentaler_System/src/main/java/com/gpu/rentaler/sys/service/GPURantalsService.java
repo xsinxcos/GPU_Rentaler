@@ -16,8 +16,7 @@ public class GPURantalsService {
 
     // 方法定义处修改参数名
     public GPURantals saveGPURental(String deviceId, Long userId, Instant rentalStartTime,
-                              BigDecimal hourlyRate, String rentalStatus, String containerId,
-                              String sshHost, String sshUsername, String sshPassword) {
+                              BigDecimal hourlyRate, String rentalStatus, String containerId,String containerName) {
         GPURantals gpuRental = new GPURantals();
         gpuRental.setDeviceId(deviceId);
         gpuRental.setUserId(userId);
@@ -25,9 +24,7 @@ public class GPURantalsService {
         gpuRental.setHourlyRate(hourlyRate);
         gpuRental.setStatus(rentalStatus);
         gpuRental.setContainerId(containerId);
-        gpuRental.setSshHost(sshHost);
-        gpuRental.setSshUsername(sshUsername);
-        gpuRental.setSshPassword(sshPassword);
+        gpuRental.setContainerName(containerName);
 
         // 持久化操作
         return gpuRantalsRepository.save(gpuRental);
