@@ -41,3 +41,15 @@ app:
     super-ssh-user:
         name: ${ssh_username:root}
         pwd:  ${ssh_userpwd:123456}
+
+
+grpc:
+    server:
+        port: 50055             # 默认端口，如果想每个服务不同端口，可以在启动类配置
+        enableReflection: true
+        maxInboundMessageSize: 1GB
+    client:
+        backend:
+            address: "localhost:50051"
+            negotiationType: plaintext  # 明文通信，不使用 TLS
+            maxInboundMessageSize: 50MB

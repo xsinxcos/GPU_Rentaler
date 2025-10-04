@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package gpu.rentaler;
+
+option java_package = "com.gpu.rentaler.grpc";
+option java_outer_classname = "MonitorServiceProto";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// 占位 GPUDeviceInfo，如果你已有定义，可以直接替换
+message GPUDeviceInfo {
+    int32 deviceIndex = 1;
+    string deviceId = 2;
+    string brand = 3;
+    string model = 4;
+    int64 memoryTotal = 5;
+}
+
+// ProcessInfo 对应 Java 实体
+message ProcessInfo {
+    string pid = 1;
+    string name = 2;
+    string deviceId = 3;
+    string usedMemoryMB = 4;
+    string containerId = 5;
+    google.protobuf.Timestamp time = 6;
+}
+
+// ServerInfo 对应 Java 实体
+message ServerInfo {
+    int64 serverId = 1;
+    string hostname = 2;
+    string ipAddress = 3;
+    string cpuModel = 4;
+    int32 cpuCores = 5;
+    int32 ramTotalGb = 6;
+    int32 storageTotalGb = 7;
+    int32 gpuSlots = 8;
+    repeated GPUDeviceInfo gpuDeviceInfos = 9;
+}
+
+// 服务定义
+service MonitorService {
+    // 上报服务器信息，返回服务器ID
+    rpc reportServerInfo(ServerInfo) returns (Int64Value);
+
+    // 更新服务器信息，无返回值
+    rpc updateServerInfo(ServerInfo) returns (google.protobuf.Empty);
+
+    // 上报进程信息，无返回值
+    rpc reportProcessMsg(ReportProcessMsgRequest) returns (google.protobuf.Empty);
+}
+
+// 包装返回 int64
+message Int64Value {
+    int64 value = 1;
+}
+
+// 上报多个进程信息请求
+message ReportProcessMsgRequest {
+    int64 serverId = 1;
+    repeated ProcessInfo processInfos = 2;
+}

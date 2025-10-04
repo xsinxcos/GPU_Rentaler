@@ -30,4 +30,9 @@ public class GPURantalsService {
         return gpuRantalsRepository.save(gpuRental);
     }
 
+
+    public GPURantals getById(Long id){
+        return gpuRantalsRepository.findById(id).get();
+    }
+
 }

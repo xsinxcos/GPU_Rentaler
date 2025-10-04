@@ -1,0 +1,111 @@
+package com.gpu.rentaler.sys.monitor;
+
+import com.google.protobuf.Empty;
+import com.google.protobuf.Timestamp;
+import com.gpu.rentaler.grpc.MonitorServiceGrpc;
+import com.gpu.rentaler.grpc.MonitorServiceProto;
+import com.gpu.rentaler.sys.model.Server;
+import com.gpu.rentaler.sys.service.GPUDeviceService;
+import com.gpu.rentaler.sys.service.GPUProcessActivityService;
+import com.gpu.rentaler.sys.service.ServerService;
+import com.gpu.rentaler.sys.service.dto.BasicGPUDeviceDTO;
+import io.grpc.stub.StreamObserver;
+import jakarta.annotation.Resource;
+import net.devh.boot.grpc.server.service.GrpcService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
+@GrpcService
+@Service
+public class GrpcDeviceMonitorService extends MonitorServiceGrpc.MonitorServiceImplBase {
+    private static final Logger log = LogManager.getLogger(GrpcDeviceMonitorService.class);
+
+    @Resource
+    private ServerService serverService;
+
+    @Resource
+    private GPUDeviceService gpuDeviceService;
+
+    @Resource
+    private ServerHeartBeatRecord serverHeartBeatRecord;
+
+    @Resource
+    private GPUProcessActivityService gpuProcessActivityService;
+
+
+    @Override
+    public void reportServerInfo(MonitorServiceProto.ServerInfo request, StreamObserver<MonitorServiceProto.Int64Value> responseObserver) {
+        Server server = serverService.saveServerInfo(
+            request.getHostname(),
+            request.getIpAddress(),
+            request.getCpuModel(),
+            request.getCpuCores(),
+            request.getRamTotalGb(),
+            request.getStorageTotalGb(),
+            request.getGpuSlots()
+        );
+        List<MonitorServiceProto.GPUDeviceInfo> gpuDeviceInfosList = request.getGpuDeviceInfosList();
+        List<BasicGPUDeviceDTO> dtos = new ArrayList<>();
+        for (MonitorServiceProto.GPUDeviceInfo info : gpuDeviceInfosList) {
+            dtos.add(new BasicGPUDeviceDTO(info.getDeviceIndex(), info.getDeviceId(), info.getBrand(), info.getModel(), info.getMemoryTotal()));
+        }
+        gpuDeviceService.saveOrUpdateGPUDeviceInfo(server.getId(), dtos);
+
+        MonitorServiceProto.Int64Value resp = MonitorServiceProto.Int64Value.newBuilder().setValue(server.getId()).build();
+        responseObserver.onNext(resp);
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void updateServerInfo(MonitorServiceProto.ServerInfo request, StreamObserver<Empty> responseObserver) {
+        asyncExecute(() -> {
+            serverService.updateServerInfo(
+                request.getServerId(),
+                request.getHostname(),
+                request.getIpAddress(),
+                request.getCpuModel(),
+                request.getCpuCores(),
+                request.getRamTotalGb(),
+                request.getStorageTotalGb(),
+                request.getGpuSlots()
+            );
+            List<MonitorServiceProto.GPUDeviceInfo> gpuDeviceInfosList = request.getGpuDeviceInfosList();
+            List<BasicGPUDeviceDTO> dtos = new ArrayList<>();
+            for (MonitorServiceProto.GPUDeviceInfo info : gpuDeviceInfosList) {
+                dtos.add(new BasicGPUDeviceDTO(info.getDeviceIndex(), info.getDeviceId(), info.getBrand(), info.getModel(), info.getMemoryTotal()));
+            }
+            gpuDeviceService.saveOrUpdateGPUDeviceInfo(request.getServerId(), dtos);
+        });
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+    }
+
+    @Override
+    public void reportProcessMsg(MonitorServiceProto.ReportProcessMsgRequest request, StreamObserver<Empty> responseObserver) {
+        asyncExecute(() -> {
+            long serverId = request.getServerId();
+            serverHeartBeatRecord.recordHeartBeat(serverId);
+            List<MonitorServiceProto.ProcessInfo> processInfos = request.getProcessInfosList();
+            processInfos.forEach(item ->
+                {
+                    Timestamp time = item.getTime();
+                    Instant instant = Instant.ofEpochSecond(time.getSeconds(), time.getNanos());
+                    gpuProcessActivityService.saveActivity(item.getPid(), item.getName(), item.getDeviceId(), instant);
+                }
+            );
+        });
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+    }
+
+    @Async("IOTaskExecutor")
+    public void asyncExecute(Runnable task) {
+        task.run();
+    }
+}

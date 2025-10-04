@@ -5,6 +5,7 @@ import com.gpu.rentaler.sys.constant.DeviceStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.repository.GPUDeviceRepository;
 import com.gpu.rentaler.sys.repository.GPURantalsRepository;
+import com.gpu.rentaler.sys.service.dto.BasicGPUDeviceDTO;
 import com.gpu.rentaler.sys.service.dto.GPUDeviceDTO;
 import com.gpu.rentaler.sys.service.dto.PageDTO;
 import com.gpu.rentaler.sys.service.dto.RentableGPUDeviceDTO;
@@ -32,42 +33,41 @@ public class GPUDeviceService {
     }
 
     @Transactional
-    public void saveOrUpdateGPUDeviceInfo(Long serverId, List<GPUDeviceInfo> gpuDeviceInfos) {
+    public void saveOrUpdateGPUDeviceInfo(Long serverId, List<BasicGPUDeviceDTO> gpuDeviceInfos) {
         List<GPUDevice> existingDevices = gpuDeviceRepository.findAllByServerId(serverId);
         Map<String, GPUDevice> existingDeviceMap = existingDevices.stream()
             .collect(Collectors.toMap(GPUDevice::getDeviceId, device -> device));
-        List<GPUDeviceInfo> updateDevices = new ArrayList<>();
-        List<GPUDeviceInfo> saveDevices = new ArrayList<>();
-        for (GPUDeviceInfo gpuDeviceInfo : gpuDeviceInfos) {
-            if (existingDeviceMap.containsKey(gpuDeviceInfo.getDeviceId())) {
+        List<BasicGPUDeviceDTO> updateDevices = new ArrayList<>();
+        List<BasicGPUDeviceDTO> saveDevices = new ArrayList<>();
+        for (BasicGPUDeviceDTO gpuDeviceInfo : gpuDeviceInfos) {
+            if (existingDeviceMap.containsKey(gpuDeviceInfo.deviceId())) {
                 updateDevices.add(gpuDeviceInfo);
             } else {
                 saveDevices.add(gpuDeviceInfo);
             }
         }
 
-        for (GPUDeviceInfo updateDevice : updateDevices) {
-            GPUDevice existingDevice = existingDeviceMap.get(updateDevice.getDeviceId());
-            existingDevice.setArchitecture(updateDevice.getArchitecture());
-            existingDevice.setMemoryTotal(updateDevice.getMemoryTotal());
-            existingDevice.setDeviceIndex(updateDevice.getDeviceIndex());
-            existingDevice.setBrand(updateDevice.getBrand());
-            existingDevice.setMemoryType(updateDevice.getMemoryType());
-            existingDevice.setModel(updateDevice.getModel());
+        for (BasicGPUDeviceDTO updateDevice : updateDevices) {
+            GPUDevice existingDevice = existingDeviceMap.get(updateDevice.deviceId());
+            existingDevice.setServerId(serverId);
+            existingDevice.setMemoryTotal(updateDevice.memoryTotal());
+            existingDevice.setDeviceIndex(updateDevice.deviceIndex());
+            existingDevice.setBrand(updateDevice.brand());
+            existingDevice.setMemoryTotal(updateDevice.memoryTotal());
+            existingDevice.setModel(updateDevice.model());
             existingDevice.setStatus(DeviceStatus.ONLINE);
             gpuDeviceRepository.save(existingDevice);
         }
 
-        for (GPUDeviceInfo saveDevice : saveDevices) {
+        for (BasicGPUDeviceDTO saveDevice : saveDevices) {
             GPUDevice newDevice = new GPUDevice();
             newDevice.setServerId(serverId);
-            newDevice.setDeviceId(saveDevice.getDeviceId());
-            newDevice.setArchitecture(saveDevice.getArchitecture());
-            newDevice.setMemoryTotal(saveDevice.getMemoryTotal());
-            newDevice.setDeviceIndex(saveDevice.getDeviceIndex());
-            newDevice.setBrand(saveDevice.getBrand());
-            newDevice.setMemoryType(saveDevice.getMemoryType());
-            newDevice.setModel(saveDevice.getModel());
+            newDevice.setMemoryTotal(saveDevice.memoryTotal());
+            newDevice.setDeviceIndex(saveDevice.deviceIndex());
+            newDevice.setBrand(saveDevice.brand());
+            newDevice.setMemoryTotal(saveDevice.memoryTotal());
+            newDevice.setModel(saveDevice.model());
+            newDevice.setStatus(DeviceStatus.ONLINE);
             newDevice.setStatus(DeviceStatus.ONLINE);
             gpuDeviceRepository.save(newDevice);
         }
@@ -91,7 +91,7 @@ public class GPUDeviceService {
             GPUDevice device = getByDeviceId(deviceId);
             if(device.getIsRentable()){
                 device.setIsRentable(false);
-                //gpuDeviceRepository.save(device);
+                gpuDeviceRepository.save(device);
                 return Optional.of(device);
             }
         }

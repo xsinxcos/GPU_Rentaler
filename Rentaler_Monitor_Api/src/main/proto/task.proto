@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package gpu.rentaler;
+
+option java_package = "com.gpu.rentaler.grpc";
+option java_outer_classname = "TaskAssignServiceProto";
+
+import "google/protobuf/empty.proto";
+
+// ================================
+// 响应对象：容器信息
+// ================================
+message DContainerInfoResp {
+    string containerName = 1; // 容器名称
+    string containerId = 2;   // 容器ID
+}
+
+// ================================
+// 请求对象：停止 Docker 容器
+// ================================
+message StopDockerContainerRequest {
+    string containerId = 1;   // 目标容器ID
+}
+
+// ================================
+// 请求对象：上传 Docker 镜像
+// ================================
+message UpDockerImageRequest {
+    bytes imageFile = 1;              // Docker 镜像文件内容
+    repeated int32 deviceIndexs = 2;  // GPU 设备索引列表
+}
+
+// ================================
+// 服务定义
+// ================================
+service TaskAssignService {
+    // 停止指定 Docker 容器
+    rpc StopDockerContainer(StopDockerContainerRequest) returns (google.protobuf.Empty);
+
+    // 上传 Docker 镜像并启动容器，返回容器信息
+    rpc UpDockerImage(UpDockerImageRequest) returns (DContainerInfoResp);
+}

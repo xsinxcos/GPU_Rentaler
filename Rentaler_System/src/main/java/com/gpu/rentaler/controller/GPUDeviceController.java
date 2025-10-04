@@ -7,7 +7,7 @@ import com.gpu.rentaler.common.authz.RequiresPermissions;
 import com.gpu.rentaler.entity.DContainerInfoResp;
 import com.gpu.rentaler.sys.constant.RantalStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
-import com.gpu.rentaler.sys.model.StorageFile;
+import com.gpu.rentaler.sys.model.GPURantals;
 import com.gpu.rentaler.sys.monitor.DeviceTaskService;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
 import com.gpu.rentaler.sys.service.GPURantalsService;

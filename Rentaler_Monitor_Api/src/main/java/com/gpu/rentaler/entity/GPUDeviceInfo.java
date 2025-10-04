@@ -10,13 +10,7 @@ public class GPUDeviceInfo implements Serializable {
     private Integer deviceIndex;
     private String brand;
     private String model;
-    private String architecture;
     private Long memoryTotal;
-    private String memoryType;
-    private Integer cudaCores;
-    private Integer tensorCores;
-    private Integer baseClock;
-    private Integer boostClock;
     private String status = "ONLINE";
 
     // 构造函数
@@ -57,60 +51,12 @@ public class GPUDeviceInfo implements Serializable {
         this.model = model;
     }
 
-    public String getArchitecture() {
-        return architecture;
-    }
-
-    public void setArchitecture(String architecture) {
-        this.architecture = architecture;
-    }
-
     public Long getMemoryTotal() {
         return memoryTotal;
     }
 
     public void setMemoryTotal(Long memoryTotal) {
         this.memoryTotal = memoryTotal;
-    }
-
-    public String getMemoryType() {
-        return memoryType;
-    }
-
-    public void setMemoryType(String memoryType) {
-        this.memoryType = memoryType;
-    }
-
-    public Integer getCudaCores() {
-        return cudaCores;
-    }
-
-    public void setCudaCores(Integer cudaCores) {
-        this.cudaCores = cudaCores;
-    }
-
-    public Integer getTensorCores() {
-        return tensorCores;
-    }
-
-    public void setTensorCores(Integer tensorCores) {
-        this.tensorCores = tensorCores;
-    }
-
-    public Integer getBaseClock() {
-        return baseClock;
-    }
-
-    public void setBaseClock(Integer baseClock) {
-        this.baseClock = baseClock;
-    }
-
-    public Integer getBoostClock() {
-        return boostClock;
-    }
-
-    public void setBoostClock(Integer boostClock) {
-        this.boostClock = boostClock;
     }
 
     public String getStatus() {

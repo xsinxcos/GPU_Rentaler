@@ -60,3 +60,9 @@ dubbo:
 
     scan:
         base-packages: com.gpu.rentaler.sys.monitor
+
+grpc:
+    server:
+        port: 50051             # 默认端口，如果想每个服务不同端口，可以在启动类配置
+        enableReflection: true
+        maxInboundMessageSize: 1GB

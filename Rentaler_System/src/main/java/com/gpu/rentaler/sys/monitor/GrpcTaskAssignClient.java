@@ -1,0 +1,65 @@
+package com.gpu.rentaler.sys.monitor;
+
+import com.google.protobuf.ByteString;
+import com.gpu.rentaler.grpc.TaskAssignServiceGrpc;
+import com.gpu.rentaler.grpc.TaskAssignServiceProto.DContainerInfoResp;
+import com.gpu.rentaler.grpc.TaskAssignServiceProto.StopDockerContainerRequest;
+import com.gpu.rentaler.grpc.TaskAssignServiceProto.UpDockerImageRequest;
+import io.grpc.ManagedChannel;
+import io.grpc.ManagedChannelBuilder;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+
+
+public class GrpcTaskAssignClient {
+
+    private final TaskAssignServiceGrpc.TaskAssignServiceBlockingStub blockingStub;
+
+    public GrpcTaskAssignClient(String host, int port) {
+        ManagedChannel channel = ManagedChannelBuilder.forAddress(host, port)
+            .usePlaintext() // 开发环境使用明文
+            .build();
+        blockingStub = TaskAssignServiceGrpc.newBlockingStub(channel);
+    }
+
+    /**
+     * 上传 Docker 镜像并启动容器
+     */
+    public DContainerInfoResp upDockerImage(Path imageFilePath, List<Integer> deviceIndexes) throws IOException {
+        byte[] imageBytes = Files.readAllBytes(imageFilePath);
+
+        UpDockerImageRequest request = UpDockerImageRequest.newBuilder()
+            .setImageFile(ByteString.copyFrom(imageBytes))
+            .addAllDeviceIndexs(deviceIndexes)
+            .build();
+
+        return blockingStub.upDockerImage(request);
+    }
+
+    /**
+     * 停止 Docker 容器
+     */
+    public void stopDockerContainer(String containerId) {
+        StopDockerContainerRequest request = StopDockerContainerRequest.newBuilder()
+            .setContainerId(containerId)
+            .build();
+
+        blockingStub.stopDockerContainer(request); // 返回 Empty，相当于 void
+        System.out.println("Container stopped: " + containerId);
+    }
+
+    public static void main(String[] args) throws IOException {
+        GrpcTaskAssignClient client = new GrpcTaskAssignClient("localhost", 50055);
+
+        // 示例：上传镜像启动容器
+        Path imagePath = Path.of("files/6g676_2048.tar");
+        DContainerInfoResp resp = client.upDockerImage(imagePath, List.of(0));
+        System.out.println("Container started: " + resp.getContainerName() + ", ID: " + resp.getContainerId());
+
+        // 示例：停止容器
+        client.stopDockerContainer(resp.getContainerId());
+    }
+}

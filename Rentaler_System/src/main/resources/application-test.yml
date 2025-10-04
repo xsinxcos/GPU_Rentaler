@@ -11,7 +11,7 @@ spring:
         name: gpu_rentaler_0
     datasource:
         driver-class-name: com.mysql.cj.jdbc.Driver
-        url: ${SPRING_DATASOURCE_URL:jdbc:mysql://127.0.0.1:3306/gpu_rentaler_0?characterEncoding=utf8}
+        url: ${SPRING_DATASOURCE_URL:jdbc:mysql://127.0.0.1:3306/gpu_rentaler_0?characterEncoding=utf8?serverTimezone=Asia/Shanghai}
         username: ${SPRING_DATASOURCE_USERNAME:root}
         password: ${SPRING_DATASOURCE_PASSWORD:123456}
     sql:
@@ -59,3 +59,9 @@ dubbo:
 
     scan:
         base-packages: com.gpu.rentaler.sys.monitor
+
+grpc:
+    server:
+        port: 50051             # 默认端口，如果想每个服务不同端口，可以在启动类配置
+        enableReflection: true
+        maxInboundMessageSize: 1GB
