@@ -2,6 +2,7 @@ package com.gpu.rentaler.sys.monitor;
 
 import com.google.protobuf.ByteString;
 import com.gpu.rentaler.grpc.TaskAssignServiceGrpc;
+import com.gpu.rentaler.grpc.TaskAssignServiceProto;
 import com.gpu.rentaler.grpc.TaskAssignServiceProto.DContainerInfoResp;
 import com.gpu.rentaler.grpc.TaskAssignServiceProto.StopDockerContainerRequest;
 import com.gpu.rentaler.grpc.TaskAssignServiceProto.UpDockerImageRequest;
@@ -49,6 +50,15 @@ public class GrpcTaskAssignClient {
 
         blockingStub.stopDockerContainer(request); // 返回 Empty，相当于 void
         System.out.println("Container stopped: " + containerId);
+    }
+
+    public String getLog(int num ,String containerId){
+        TaskAssignServiceProto.GetLogRequest request = TaskAssignServiceProto.GetLogRequest.newBuilder()
+            .setContainerId(containerId)
+            .setNum(num)
+            .build();
+        TaskAssignServiceProto.GetLogResp log = blockingStub.getLog(request);
+        return log.getLogContent();
     }
 
     public static void main(String[] args) throws IOException {

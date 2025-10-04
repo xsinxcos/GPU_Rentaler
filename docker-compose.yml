@@ -11,6 +11,7 @@ services:
             - "9091:9090"    # 应用端口
             - "20882:20881"  # Dubbo 端口
             - "33334:33333"  # Dubbo QoS 端口
+            - "50051:50051" # grpc 端口
         environment:
             # 数据库配置 - 连接宿主机 MySQL
             SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/gpu_rentaler_0?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true

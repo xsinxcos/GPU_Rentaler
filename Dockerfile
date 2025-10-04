@@ -6,7 +6,6 @@ COPY pom.xml .
 COPY Rentaler_Device_Monitor ./Rentaler_Device_Monitor
 COPY Rentaler_Monitor_Api ./Rentaler_Monitor_Api
 COPY Rentaler_System ./Rentaler_System
-COPY Rentaler_System_UI ./Rentaler_System_UI
 
 # 构建应用（跳过测试）
 #RUN mvn clean package -DskipTests

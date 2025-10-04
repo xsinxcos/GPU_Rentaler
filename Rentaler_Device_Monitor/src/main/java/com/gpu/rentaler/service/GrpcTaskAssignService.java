@@ -52,4 +52,26 @@ public class GrpcTaskAssignService extends TaskAssignServiceGrpc.TaskAssignServi
             log.warn(" 镜像导入失败：{}", e.getMessage());
         }
     }
+
+    @Override
+    public void getLog(TaskAssignServiceProto.GetLogRequest request, StreamObserver<TaskAssignServiceProto.GetLogResp> responseObserver) {
+        String containerId = request.getContainerId();
+        int num = request.getNum();
+        try {
+            String logs = DockerExecutor.getLatestLogs(containerId, num);
+            TaskAssignServiceProto.GetLogResp resp = TaskAssignServiceProto.GetLogResp.newBuilder()
+                .setLogContent(logs)
+                .build();
+            responseObserver.onNext(resp);
+            responseObserver.onCompleted();
+        } catch (IOException e) {
+            log.warn("{} 容器获取日志失败：{}", containerId, e.getMessage());
+        }
+    }
+
+    @Override
+    public void exportContainerData(TaskAssignServiceProto.ExportContainerDataRequest request, StreamObserver<TaskAssignServiceProto.ExportContainerDataResp> responseObserver) {
+
+        super.exportContainerData(request, responseObserver);
+    }
 }

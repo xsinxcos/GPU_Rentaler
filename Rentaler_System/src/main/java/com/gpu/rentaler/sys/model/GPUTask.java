@@ -7,8 +7,8 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 @Entity
-@Table(name = "gpu_rentals", schema = "gpu_rentaler_0")
-public class GPURantals extends BaseEntity{
+@Table(name = "gpu_task", schema = "gpu_rentaler_0")
+public class GPUTask extends BaseEntity{
 
     private Long userId;
 

@@ -31,6 +31,37 @@ message UpDockerImageRequest {
 }
 
 // ================================
+// 请求对象：获取日志
+// ================================
+message GetLogRequest {
+    string containerId = 1; // 目标容器ID
+    int32 num = 2;          // 获取最新日志行数
+}
+
+// ================================
+// 响应对象：日志内容
+// ================================
+message GetLogResp {
+    string logContent = 1; // 日志内容
+}
+
+// ================================
+// 请求对象：导出容器数据
+// ================================
+message ExportContainerDataRequest {
+    string containerId = 1; // 目标容器ID
+    string exportDir = 2;   // 容器内部要导出的目录
+}
+
+// ================================
+// 响应对象：导出容器数据结果
+// ================================
+message ExportContainerDataResp {
+    bytes zipFile = 1;       // 导出的压缩包内容
+    string fileName = 2;     // 压缩包文件名
+}
+
+// ================================
 // 服务定义
 // ================================
 service TaskAssignService {
@@ -39,4 +70,10 @@ service TaskAssignService {
 
     // 上传 Docker 镜像并启动容器，返回容器信息
     rpc UpDockerImage(UpDockerImageRequest) returns (DContainerInfoResp);
+
+    // 获取容器最新日志
+    rpc GetLog(GetLogRequest) returns (GetLogResp);
+
+    // 导出容器指定目录为压缩包
+    rpc ExportContainerData(ExportContainerDataRequest) returns (ExportContainerDataResp);
 }

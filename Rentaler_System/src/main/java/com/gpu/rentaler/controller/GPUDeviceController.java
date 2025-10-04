@@ -7,10 +7,9 @@ import com.gpu.rentaler.common.authz.RequiresPermissions;
 import com.gpu.rentaler.entity.DContainerInfoResp;
 import com.gpu.rentaler.sys.constant.RantalStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
-import com.gpu.rentaler.sys.model.GPURantals;
 import com.gpu.rentaler.sys.monitor.DeviceTaskService;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
-import com.gpu.rentaler.sys.service.GPURantalsService;
+import com.gpu.rentaler.sys.service.GPUTaskService;
 import com.gpu.rentaler.sys.service.StorageService;
 import com.gpu.rentaler.sys.service.dto.GPUDeviceDTO;
 import com.gpu.rentaler.sys.service.dto.PageDTO;
@@ -41,7 +40,7 @@ public class GPUDeviceController {
     private GPUDeviceService gpuDeviceService;
 
     @Resource
-    private GPURantalsService gpuRantalsService;
+    private GPUTaskService gpuTaskService;
 
     @Resource
     private DeviceTaskService deviceTaskService;
@@ -97,9 +96,9 @@ public class GPUDeviceController {
                     InputStream inputStream = resource.getInputStream();
                     List<String> devices = new ArrayList<>();
                     devices.add(deviceId);
-                    DContainerInfoResp infoResp = deviceTaskService.exportAndUpDockerImage(
+                    DContainerInfoResp infoResp = deviceTaskService.importAndUpDockerImage(
                         inputStream, device.getServerId(), devices);
-                    gpuRantalsService.saveGPURental(deviceId, userInfo.userId(), Instant.now(), device.getHourlyRate(), RantalStatus.ACTIVE,
+                    gpuTaskService.saveGPURental(deviceId, userInfo.userId(), Instant.now(), device.getHourlyRate(), RantalStatus.ACTIVE,
                         infoResp.containerId(), infoResp.containerName());
                 } catch (IOException e) {
                     log.warn("{} 镜像运行失败：{}", resource.getFilename(), e.getMessage());

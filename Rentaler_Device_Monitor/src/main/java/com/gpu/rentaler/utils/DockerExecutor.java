@@ -383,6 +383,20 @@ public class DockerExecutor {
         return tempFile;
     }
 
+    public static String getLatestLogs(String containerId, int tailLines) throws IOException {
+        String cmd;
+        if (tailLines > 0) {
+            cmd = String.format("docker logs --tail %d %s", tailLines, containerId);
+        } else {
+            cmd = "docker logs " + containerId;
+        }
+        ExecuteResult result = execute(cmd);
+        if (!result.isSuccess()) {
+            throw new IOException("获取日志失败: " + result.getError());
+        }
+        return result.getOutput();
+    }
+
     public static DContainerInfo runContainerAndGetInfo(String imageName, List<Integer> gpuIndexes) throws IOException {
         if (imageName == null || imageName.trim().isEmpty()) {
             throw new IllegalArgumentException("镜像名不能为空");

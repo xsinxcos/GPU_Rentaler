@@ -1,10 +1,9 @@
 package com.gpu.rentaler.sys.service;
 
-import com.gpu.rentaler.entity.GPUDeviceInfo;
 import com.gpu.rentaler.sys.constant.DeviceStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.repository.GPUDeviceRepository;
-import com.gpu.rentaler.sys.repository.GPURantalsRepository;
+import com.gpu.rentaler.sys.repository.GPUTaskRepository;
 import com.gpu.rentaler.sys.service.dto.BasicGPUDeviceDTO;
 import com.gpu.rentaler.sys.service.dto.GPUDeviceDTO;
 import com.gpu.rentaler.sys.service.dto.PageDTO;
@@ -25,11 +24,8 @@ import java.util.stream.Collectors;
 public class GPUDeviceService {
     private final GPUDeviceRepository gpuDeviceRepository;
 
-    private final GPURantalsRepository gpuRantalsRepository;
-
-    public GPUDeviceService(GPUDeviceRepository gpuDeviceRepository, GPURantalsRepository gpuRantalsRepository) {
+    public GPUDeviceService(GPUDeviceRepository gpuDeviceRepository, GPUTaskRepository gpuTaskRepository) {
         this.gpuDeviceRepository = gpuDeviceRepository;
-        this.gpuRantalsRepository = gpuRantalsRepository;
     }
 
     @Transactional
