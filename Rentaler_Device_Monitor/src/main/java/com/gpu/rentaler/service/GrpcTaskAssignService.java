@@ -1,5 +1,6 @@
 package com.gpu.rentaler.service;
 
+import com.google.protobuf.ByteString;
 import com.google.protobuf.Empty;
 import com.gpu.rentaler.entity.DContainerInfo;
 import com.gpu.rentaler.grpc.TaskAssignServiceGrpc;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
 @GrpcService
@@ -26,6 +28,7 @@ public class GrpcTaskAssignService extends TaskAssignServiceGrpc.TaskAssignServi
         String containerId = request.getContainerId();
         try {
             DockerExecutor.stopContainer(containerId, 60);
+            responseObserver.onNext(Empty.getDefaultInstance());
             responseObserver.onCompleted();
         } catch (IOException e) {
             log.error("Error stopping container {}: {}", containerId, e.getMessage());
@@ -71,7 +74,30 @@ public class GrpcTaskAssignService extends TaskAssignServiceGrpc.TaskAssignServi
 
     @Override
     public void exportContainerData(TaskAssignServiceProto.ExportContainerDataRequest request, StreamObserver<TaskAssignServiceProto.ExportContainerDataResp> responseObserver) {
+        String containerId = request.getContainerId();
+        String exportDir = request.getExportDir();
+        try (InputStream stream = DockerExecutor.exportContainerDirContentAsTarGz(containerId ,exportDir)){
+            TaskAssignServiceProto.ExportContainerDataResp resp = TaskAssignServiceProto.ExportContainerDataResp.newBuilder()
+                .setZipFile(ByteString.copyFrom(stream.readAllBytes()))
+                .setFileName(containerId + ".tar.gz").build();
+            responseObserver.onNext(resp);
+            responseObserver.onCompleted();
+        } catch (IOException e) {
+            log.warn("{} 的 {} 数据导出失败：{}" ,containerId ,exportDir ,e.getMessage());
+        }
+    }
 
-        super.exportContainerData(request, responseObserver);
+    @Override
+    public void deleteContainer(TaskAssignServiceProto.DeleteContainerRequest request, StreamObserver<Empty> responseObserver) {
+        String containerId = request.getContainerId();
+        try {
+            String imageId = DockerExecutor.getImageIdByContainerId(containerId);
+            DockerExecutor.deleteContainerById(containerId ,true);
+            DockerExecutor.deleteImageByImageId(imageId ,true);
+            responseObserver.onNext(Empty.getDefaultInstance());
+            responseObserver.onCompleted();
+        }catch (IOException e){
+            log.warn("{} 容器删除失败：{}" ,containerId ,e.getMessage());
+        }
     }
 }

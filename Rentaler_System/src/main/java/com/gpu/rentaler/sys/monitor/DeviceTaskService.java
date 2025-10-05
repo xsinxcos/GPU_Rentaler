@@ -46,13 +46,13 @@ public class DeviceTaskService {
             return new DContainerInfoResp(resp.getContainerName(), resp.getContainerId());
         } catch (IOException e) {
             log.warn("exportAndUpDockerImage error : {}", e.getMessage());
+            return new DContainerInfoResp("error" ,"error");
         } finally {
             // 使用完立即删除
             if (tempFile != null) {
                 Files.deleteIfExists(tempFile);
             }
         }
-        return null;
     }
 
     /**
@@ -86,13 +86,31 @@ public class DeviceTaskService {
 
     public void stopContainer(Long serverId, String containerId) {
         GrpcTaskAssignClient client = getGrpcTaskAssignClient(serverId);
-        //todo
+        client.stopDockerContainer(containerId);
+    }
+
+
+    public void deleteContainer(Long serverId, String containerId) {
+        GrpcTaskAssignClient client = getGrpcTaskAssignClient(serverId);
+        client.deleteDockerContainer(containerId);
     }
 
     public org.springframework.core.io.Resource exportContainerData(Long serverId, String containerId, String path) {
         GrpcTaskAssignClient client = getGrpcTaskAssignClient(serverId);
-        //todo
-        String testContent = "这是测试文本资源内容";
-        return new ByteArrayResource(testContent.getBytes(StandardCharsets.UTF_8));
+        return client.exportContainerData(containerId, path);
+    }
+
+    class NamedByteArrayResource extends ByteArrayResource {
+        private final String filename;
+
+        public NamedByteArrayResource(byte[] byteArray, String filename) {
+            super(byteArray);
+            this.filename = filename;
+        }
+
+        @Override
+        public String getFilename() {
+            return this.filename;
+        }
     }
 }

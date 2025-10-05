@@ -118,6 +118,72 @@ public class DockerExecutor {
     }
 
     /**
+     * 根据容器ID删除容器
+     *
+     * @param containerId 容器ID
+     * @param force       是否强制删除（true-即使容器在运行也删除）
+     * @return 执行结果
+     * @throws IOException 删除失败时抛出
+     */
+    public static ExecuteResult deleteContainerById(String containerId, boolean force) throws IOException {
+        if (containerId == null || containerId.trim().isEmpty()) {
+            throw new IllegalArgumentException("容器ID不能为空");
+        }
+        return removeContainer(containerId, force);
+    }
+
+    /**
+     * 根据容器ID获取其对应的镜像ID
+     *
+     * @param containerId 容器ID
+     * @return 镜像ID字符串
+     * @throws IOException 容器不存在或获取失败
+     */
+    public static String getImageIdByContainerId(String containerId) throws IOException {
+        if (containerId == null || containerId.trim().isEmpty()) {
+            throw new IllegalArgumentException("容器ID不能为空");
+        }
+
+        ExecuteResult inspectResult = inspectContainer(containerId);
+        if (!inspectResult.isSuccess()) {
+            throw new IOException("无法获取容器信息: " + inspectResult.getError());
+        }
+
+        String output = inspectResult.getOutput();
+        String imageId = null;
+
+        // 提取 "Image": "xxxx" 字段
+        Pattern pattern = Pattern.compile("\"Image\"\\s*:\\s*\"([^\"]+)\"");
+        Matcher matcher = pattern.matcher(output);
+        if (matcher.find()) {
+            imageId = matcher.group(1).trim();
+        }
+
+        if (imageId == null || imageId.isEmpty()) {
+            throw new IOException("无法解析容器对应的镜像ID");
+        }
+
+        return imageId;
+    }
+
+    /**
+     * 根据镜像ID删除镜像
+     *
+     * @param imageId 镜像ID或镜像名
+     * @param force   是否强制删除
+     * @return 执行结果
+     * @throws IOException 删除失败
+     */
+    public static ExecuteResult deleteImageByImageId(String imageId, boolean force) throws IOException {
+        if (imageId == null || imageId.trim().isEmpty()) {
+            throw new IllegalArgumentException("镜像ID不能为空");
+        }
+        return removeImage(imageId, force);
+    }
+
+
+
+    /**
      * 停止容器
      */
     public static ExecuteResult stopContainer(String containerId, int timeout)
@@ -280,13 +346,25 @@ public class DockerExecutor {
     /**
      * 使用示例
      */
-    public static void main(String[] args) throws IOException, URISyntaxException {
-        File file = new File("D:/Project/GPU_Rentaler_0/files/6g676_2048.tar");
-        InputStream inputStream = new FileInputStream(file);
+    public static void main (String[] args) throws IOException, URISyntaxException {
+        String containerId = "9eb2a4d43bcff4bc8f795af8b5fd44eb8b52d09822c5d01f59a966133678f536";
+        String containerPath = "/workspace";
+        File saveTo = new File("D:/Project/GPU_Rentaler_0/files/exported_logs.tar.gz"); // ⬅️ 修改为你想保存的本地路径
 
-        loadImageFromInputStream(inputStream);
+        try (InputStream is = DockerExecutor.exportContainerDirContentAsTarGz(containerId, containerPath);
+             OutputStream os = new FileOutputStream(saveTo)) {
 
-        inputStream.close();
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = is.read(buffer)) != -1) {
+                os.write(buffer, 0, bytesRead);
+            }
+
+            System.out.println("导出成功，保存位置：" + saveTo.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("导出失败: " + e.getMessage());
+        }
 //        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 //        CommandLine cmdLine = CommandLine.parse("docker load -i " + );
 //        DefaultExecutor executor = new DefaultExecutor();
@@ -441,6 +519,51 @@ public class DockerExecutor {
         logger.info("成功启动容器: ID={}, Name={}, GPUs={}", containerId, containerName, gpuIndexes);
         return new DContainerInfo(containerName, containerId);
     }
+
+    /**
+     * 从容器中导出指定目录下的全部内容（不包括该目录本身），并压缩为tar.gz格式返回InputStream
+     *
+     * @param containerId 容器ID
+     * @param containerDirPath 容器中的目录路径，例如 "/app/logs"
+     * @return .tar.gz 格式的 InputStream
+     */
+    public static InputStream exportContainerDirContentAsTarGz(String containerId, String containerDirPath) throws IOException {
+        // 创建临时目录
+        File tempDir = new File(System.getProperty("java.io.tmpdir"));
+        File extractRoot = new File(tempDir, "docker-export-" + UUID.randomUUID());
+        if (!extractRoot.mkdirs()) {
+            throw new IOException("创建临时目录失败: " + extractRoot.getAbsolutePath());
+        }
+
+        // docker cp 容器目录内容到 extractRoot/data 目录
+        // docker cp containerId:/app/logs/. extractRoot/data/
+        File exportTarget = new File(extractRoot, "data");
+        if (!exportTarget.mkdirs()) {
+            throw new IOException("创建导出数据目录失败: " + exportTarget.getAbsolutePath());
+        }
+
+        // 注意：要复制目录内所有内容，路径末尾加 `/.`
+        String dockerCpCmd = String.format("docker cp %s:%s/. %s", containerId, containerDirPath, exportTarget.getAbsolutePath());
+        ExecuteResult cpResult = execute(dockerCpCmd, 30);
+        if (!cpResult.isSuccess()) {
+            throw new IOException("docker cp 执行失败: " + cpResult.getError());
+        }
+
+        // 创建 tar.gz 文件
+        File tarGzFile = File.createTempFile("docker-dir-content-", ".tar.gz");
+        tarGzFile.deleteOnExit();
+
+        // 打包 exportTarget 目录内容，而不是整个 exportTarget 本身
+        String tarCmd = String.format("tar -czf %s -C %s .", tarGzFile.getAbsolutePath(), exportTarget.getAbsolutePath());
+        ExecuteResult tarResult = execute(tarCmd, 30);
+        if (!tarResult.isSuccess()) {
+            throw new IOException("压缩失败: " + tarResult.getError());
+        }
+
+        // 返回压缩包 InputStream
+        return new FileInputStream(tarGzFile);
+    }
+
 
 
 }

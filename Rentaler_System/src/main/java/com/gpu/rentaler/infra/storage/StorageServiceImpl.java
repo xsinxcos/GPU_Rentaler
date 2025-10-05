@@ -207,4 +207,13 @@ public class StorageServiceImpl implements StorageService {
         return new PageDTO<>(dtos ,storageFiles.getTotalElements());
     }
 
+    @Override
+    public boolean checkTar(String key) {
+        StorageFile file = getByKey(key);
+        if(file == null ||  !"application/x-tar".equalsIgnoreCase(file.getType())){
+            return false;
+        }
+        return true;
+    }
+
 }

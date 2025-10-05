@@ -36,4 +36,6 @@ public interface StorageService {
     Resource loadAsResource(String key);
 
     PageDTO<StorageFileDTO> getImageFileByCreateName(Pageable pageable , String name);
+
+    boolean checkTar(String key);
 }

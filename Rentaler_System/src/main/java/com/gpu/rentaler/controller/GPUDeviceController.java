@@ -5,7 +5,7 @@ import com.gpu.rentaler.common.Constants;
 import com.gpu.rentaler.common.SessionItemHolder;
 import com.gpu.rentaler.common.authz.RequiresPermissions;
 import com.gpu.rentaler.entity.DContainerInfoResp;
-import com.gpu.rentaler.sys.constant.RantalStatus;
+import com.gpu.rentaler.sys.constant.TaskStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.monitor.DeviceTaskService;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
@@ -17,6 +17,7 @@ import com.gpu.rentaler.sys.service.dto.RentableGPUDeviceDTO;
 import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.Resource;
+import jakarta.validation.constraints.NotNull;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Pageable;
@@ -84,7 +85,11 @@ public class GPUDeviceController {
 
     @RequiresPermissions("gpu:lease")
     @PostMapping("/{deviceId}/lease")
-    public ResponseEntity<LeaseGPUDeviceDTO> leaseGPUDevice(String key, @PathVariable String deviceId) {
+    public ResponseEntity<LeaseGPUDeviceDTO> leaseGPUDevice(@NotNull String key, @PathVariable String deviceId) {
+        boolean isTar = storageService.checkTar(key);
+        if(!isTar){
+            return ResponseEntity.ok(new LeaseGPUDeviceDTO(false ,"租用失败，资源不符合要求"));
+        }
         // 租用GPU设备的逻辑
         Optional<GPUDevice> lease = gpuDeviceService.lease(deviceId);
         final LeaseGPUDeviceDTO[] dto = new LeaseGPUDeviceDTO[1];
@@ -98,7 +103,7 @@ public class GPUDeviceController {
                     devices.add(deviceId);
                     DContainerInfoResp infoResp = deviceTaskService.importAndUpDockerImage(
                         inputStream, device.getServerId(), devices);
-                    gpuTaskService.saveGPURental(deviceId, userInfo.userId(), Instant.now(), device.getHourlyRate(), RantalStatus.ACTIVE,
+                    gpuTaskService.saveGPURental(deviceId, userInfo.userId(), Instant.now(), device.getHourlyRate(), TaskStatus.ACTIVE,
                         infoResp.containerId(), infoResp.containerName());
                 } catch (IOException e) {
                     log.warn("{} 镜像运行失败：{}", resource.getFilename(), e.getMessage());
@@ -117,15 +122,6 @@ public class GPUDeviceController {
     }
 
     public record LeaseGPUDeviceDTO(boolean isSuccess, String msg) {
-    }
-
-    @RequiresPermissions("gpu:return")
-    @PostMapping("/{deviceId}/return")
-    public ResponseEntity<Void> returnGPUDevice(@PathVariable String deviceId) {
-        // 归还GPU设备的逻辑
-        gpuDeviceService.returnDevice(deviceId);
-        // todo 完善租借表
-        return ResponseEntity.noContent().build();
     }
 
 }

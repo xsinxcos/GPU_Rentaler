@@ -8,6 +8,8 @@ import com.gpu.rentaler.grpc.TaskAssignServiceProto.StopDockerContainerRequest;
 import com.gpu.rentaler.grpc.TaskAssignServiceProto.UpDockerImageRequest;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -52,6 +54,16 @@ public class GrpcTaskAssignClient {
         System.out.println("Container stopped: " + containerId);
     }
 
+    /**
+     * 删除 Docker 容器
+     */
+    public void deleteDockerContainer(String containerId) {
+        TaskAssignServiceProto.DeleteContainerRequest request = TaskAssignServiceProto.DeleteContainerRequest.newBuilder().setContainerId(containerId)
+            .build();
+        blockingStub.deleteContainer(request);
+    }
+
+
     public String getLog(int num ,String containerId){
         TaskAssignServiceProto.GetLogRequest request = TaskAssignServiceProto.GetLogRequest.newBuilder()
             .setContainerId(containerId)
@@ -60,6 +72,30 @@ public class GrpcTaskAssignClient {
         TaskAssignServiceProto.GetLogResp log = blockingStub.getLog(request);
         return log.getLogContent();
     }
+
+    public Resource exportContainerData(String containerId ,String path){
+        TaskAssignServiceProto.ExportContainerDataRequest req = TaskAssignServiceProto.ExportContainerDataRequest.newBuilder()
+            .setContainerId(containerId)
+            .setExportDir(path).build();
+        TaskAssignServiceProto.ExportContainerDataResp resp = blockingStub.exportContainerData(req);
+        return new NamedByteArrayResource(resp.getZipFile().toByteArray() ,resp.getFileName());
+    }
+
+    public class NamedByteArrayResource extends ByteArrayResource {
+        private final String filename;
+
+        public NamedByteArrayResource(byte[] byteArray, String filename) {
+            super(byteArray);
+            this.filename = filename;
+        }
+
+        @Override
+        public String getFilename() {
+            return this.filename;
+        }
+    }
+
+
 
     public static void main(String[] args) throws IOException {
         GrpcTaskAssignClient client = new GrpcTaskAssignClient("localhost", 50055);

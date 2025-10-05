@@ -1,5 +1,6 @@
 package com.gpu.rentaler.sys.service;
 
+import com.gpu.rentaler.common.StringUtils;
 import com.gpu.rentaler.sys.constant.DeviceStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.repository.GPUDeviceRepository;
@@ -82,10 +83,10 @@ public class GPUDeviceService {
     }
 
 
-    public Optional<GPUDevice> lease(String deviceId){
-        synchronized (this){
+    public Optional<GPUDevice> lease(String deviceId) {
+        synchronized (this) {
             GPUDevice device = getByDeviceId(deviceId);
-            if(device.getIsRentable()){
+            if (device.getIsRentable()) {
                 device.setIsRentable(false);
                 gpuDeviceRepository.save(device);
                 return Optional.of(device);
@@ -138,16 +139,21 @@ public class GPUDeviceService {
             gpuDevice.setMemoryType(memoryType);
             gpuDevice.setStatus(status);
             gpuDevice.setIsRentable(isRentable);
-            gpuDevice.setHourlyRate(new BigDecimal(hourlyRate));
-            gpuDevice.setTotalRuntimeHours(new BigDecimal(totalRuntimeHours));
-            gpuDevice.setTotalRevenue(new BigDecimal(totalRevenue));
-
+            if (!StringUtils.isBlank(hourlyRate)) {
+                gpuDevice.setHourlyRate(new BigDecimal(hourlyRate));
+            }
+            if (!StringUtils.isBlank(totalRuntimeHours)) {
+                gpuDevice.setTotalRuntimeHours(new BigDecimal(totalRuntimeHours));
+            }
+            if (!StringUtils.isBlank(totalRevenue)) {
+                gpuDevice.setTotalRevenue(new BigDecimal(totalRevenue));
+            }
             gpuDeviceRepository.save(gpuDevice);
         }
     }
 
     public synchronized void returnDevice(String deviceId) {
-        gpuDeviceRepository.updateIsRentableByDeviceId(true ,deviceId);
+        gpuDeviceRepository.updateIsRentableByDeviceId(true, deviceId);
     }
 
     public List<GPUDevice> getByDeviceIds(List<String> deviceIds) {

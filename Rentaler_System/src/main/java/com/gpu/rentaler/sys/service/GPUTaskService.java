@@ -1,6 +1,6 @@
 package com.gpu.rentaler.sys.service;
 
-import com.gpu.rentaler.sys.constant.RantalStatus;
+import com.gpu.rentaler.sys.constant.TaskStatus;
 import com.gpu.rentaler.sys.model.GPUTask;
 import com.gpu.rentaler.sys.repository.GPUTaskRepository;
 import com.gpu.rentaler.sys.service.dto.GPUTaskDTO;
@@ -8,6 +8,7 @@ import com.gpu.rentaler.sys.service.dto.PageDTO;
 import jakarta.annotation.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -87,7 +88,7 @@ public class GPUTaskService {
             Instant endTime = Instant.now();
             task.setEndTime(endTime);
             task.setActualDurationHours(getDur(task.getStartTime() ,task.getEndTime()));
-            task.setStatus(RantalStatus.COMPLETED);
+            task.setStatus(TaskStatus.COMPLETED);
             gpuTaskRepository.save(task);
         }
     }
@@ -98,5 +99,9 @@ public class GPUTaskService {
         BigDecimal seconds = BigDecimal.valueOf(duration.getSeconds())
             .add(BigDecimal.valueOf(duration.getNano(), 9));
         return  seconds.divide(BigDecimal.valueOf(3600), 9, RoundingMode.HALF_UP);
+    }
+
+    public List<GPUTask> getAllRunningTask(){
+        return gpuTaskRepository.findByStatus(TaskStatus.ACTIVE);
     }
 }

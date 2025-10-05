@@ -15,6 +15,7 @@ import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.Resource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -87,6 +88,7 @@ public class TaskController {
                 // 释放设备
                 gpuDeviceService.returnDevice(item.getDeviceId());
                 deviceTaskService.stopContainer(device.getServerId(), item.getContainerId());
+                deviceTaskService.deleteContainer(device.getServerId() ,item.getContainerId());
             }
         }
         return ResponseEntity.ok().build();
@@ -107,7 +109,8 @@ public class TaskController {
                 resp = deviceTaskService.exportContainerData(device.getServerId(), item.getContainerId(), path);
             }
         }
-        return ResponseEntity.ok(resp);
+        MediaType tarGz = MediaType.parseMediaType("application/gzip");
+        return ResponseEntity.ok().contentType(tarGz).body(resp);
     }
 
     public record ExportDataReq(Long taskId, String path) {

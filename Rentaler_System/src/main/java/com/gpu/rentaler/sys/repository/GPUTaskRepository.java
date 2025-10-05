@@ -7,10 +7,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.lang.Nullable;
 
+import java.util.List;
+
 public interface GPUTaskRepository extends JpaRepository<GPUTask, Long> {
     @Query("select g from GPUTask g where g.userId = ?1 and (?2 is null or g.status = ?2) order by g.id desc ")
     Page<GPUTask> findPageByUserIdAndStatus(Long userId, @Nullable String status, Pageable pageable);
 
     @Query("select g from GPUTask g where (?1 is null or g.status = ?1) order by g.id desc ")
     Page<GPUTask> findPageByStatus(@Nullable String status, Pageable pageable);
+
+    @Query("select g from GPUTask g where g.status = ?1")
+    List<GPUTask> findByStatus(String status);
 }
