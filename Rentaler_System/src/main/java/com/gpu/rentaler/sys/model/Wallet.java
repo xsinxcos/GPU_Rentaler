@@ -4,10 +4,12 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
+@DynamicInsert
 @Entity
 @Table(name = "wallet", schema = "gpu_rentaler_0")
 public class Wallet extends BaseEntity {
@@ -28,6 +30,7 @@ public class Wallet extends BaseEntity {
     @PrePersist
     protected void onCreate() {
         this.updatedAt = Instant.now();
+        this.lastTransactionTime = Instant.now();
     }
 
     public Long getUserId() {

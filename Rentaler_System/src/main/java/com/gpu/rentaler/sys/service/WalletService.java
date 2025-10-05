@@ -23,6 +23,7 @@ public class WalletService {
             wallet = new Wallet();
             wallet.setUserId(userId);
             wallet.setStatus(0);
+            wallet.setBalance(new BigDecimal(0));
             wallet = walletRepository.save(wallet);
         }
         return new WalletDTO(wallet.getId() ,wallet.getUserId() ,wallet.getBalance().toPlainString() ,wallet.getStatus() ,wallet.getLastTransactionTime());

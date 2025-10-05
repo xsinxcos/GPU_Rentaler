@@ -2,10 +2,12 @@ package com.gpu.rentaler.sys.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 
+@DynamicInsert
 @Entity
 @Table(name = "gpu_task", schema = "gpu_rentaler_0")
 public class GPUTask extends BaseEntity{

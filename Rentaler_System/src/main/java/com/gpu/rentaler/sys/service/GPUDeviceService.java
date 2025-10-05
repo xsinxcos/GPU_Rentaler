@@ -146,11 +146,7 @@ public class GPUDeviceService {
         }
     }
 
-    public void leaseDevice(String deviceId){
-        gpuDeviceRepository.updateIsRentableByDeviceId(false ,deviceId);
-    }
-
-    public void returnDevice(String deviceId) {
+    public synchronized void returnDevice(String deviceId) {
         gpuDeviceRepository.updateIsRentableByDeviceId(true ,deviceId);
     }
 

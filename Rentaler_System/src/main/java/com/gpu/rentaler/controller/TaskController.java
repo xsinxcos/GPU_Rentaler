@@ -84,6 +84,8 @@ public class TaskController {
             if (item.getUserId().equals(userInfo.userId())) {
                 gpuTaskService.finishTask(taskId);
                 GPUDevice device = gpuDeviceService.getByDeviceId(item.getDeviceId());
+                // 释放设备
+                gpuDeviceService.returnDevice(item.getDeviceId());
                 deviceTaskService.stopContainer(device.getServerId(), item.getContainerId());
             }
         }

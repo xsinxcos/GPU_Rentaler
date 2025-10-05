@@ -2,9 +2,11 @@ package com.gpu.rentaler.sys.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.math.BigDecimal;
 
+@DynamicInsert
 @Entity
 @Table(name = "gpu_devices", schema = "gpu_rentaler_0")
 public class GPUDevice extends BaseEntity {
