@@ -12,9 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.List;
 
 @GrpcService
@@ -36,23 +34,76 @@ public class GrpcTaskAssignService extends TaskAssignServiceGrpc.TaskAssignServi
     }
 
     @Override
-    public void upDockerImage(TaskAssignServiceProto.UpDockerImageRequest request, StreamObserver<TaskAssignServiceProto.DContainerInfoResp> responseObserver) {
-        byte[] imageBytes = request.getImageFile().toByteArray();
-        List<Integer> deviceIndexes = request.getDeviceIndexsList();
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(imageBytes);
+    public StreamObserver<TaskAssignServiceProto.UpDockerImageChunkRequest> upDockerImageStream(
+        StreamObserver<TaskAssignServiceProto.UpDockerImageChunkResp> responseObserver) {
+
         try {
-            String imageName = DockerExecutor.loadImageFromInputStream(inputStream);
-            DContainerInfo dContainerInfo = DockerExecutor.runContainerAndGetInfo(imageName, deviceIndexes);
-            String containerName = dContainerInfo.containerName();
-            String containerId = dContainerInfo.containerId();
-            TaskAssignServiceProto.DContainerInfoResp resp = TaskAssignServiceProto.DContainerInfoResp.newBuilder()
-                .setContainerName(containerName)
-                .setContainerId(containerId != null ? containerId : "")
-                .build();
-            responseObserver.onNext(resp);
-            responseObserver.onCompleted();
+            // 创建临时文件保存上传的镜像分片
+            File tempImageFile = File.createTempFile("docker-image-", ".tar");
+            FileOutputStream fos = new FileOutputStream(tempImageFile);
+
+            // 用于保存 GPU 设备索引（假设所有分片的 deviceIndex 一致）
+            final int[] deviceIndex = new int[1];
+
+            return new StreamObserver<>() {
+                @Override
+                public void onNext(TaskAssignServiceProto.UpDockerImageChunkRequest chunkRequest) {
+                    try {
+                        // 写入分片数据到临时文件
+                        chunkRequest.getChunkData().writeTo(fos);
+                        deviceIndex[0] = chunkRequest.getDeviceIndex();
+                    } catch (IOException e) {
+                        log.error("写入镜像分片失败: {}", e.getMessage());
+                        responseObserver.onError(e);
+                    }
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    log.error("上传镜像流异常: {}", t.getMessage());
+                    try {
+                        fos.close();
+                        tempImageFile.delete();
+                    } catch (IOException ignored) {
+                    }
+                }
+
+                @Override
+                public void onCompleted() {
+                    try {
+                        fos.close();
+
+                        // 用文件流导入 Docker 镜像
+                        try (FileInputStream fis = new FileInputStream(tempImageFile)) {
+                            String imageName = DockerExecutor.loadImageFromInputStream(fis);
+                            DContainerInfo dContainerInfo = DockerExecutor.runContainerAndGetInfo(imageName, List.of(deviceIndex[0]));
+
+                            TaskAssignServiceProto.UpDockerImageChunkResp resp =
+                                TaskAssignServiceProto.UpDockerImageChunkResp.newBuilder()
+                                    .setContainerName(dContainerInfo.containerName())
+                                    .setContainerId(dContainerInfo.containerId() != null ? dContainerInfo.containerId() : "")
+                                    .build();
+
+                            responseObserver.onNext(resp);
+                            responseObserver.onCompleted();
+                        }
+                    } catch (IOException e) {
+                        log.error("镜像导入失败: {}", e.getMessage());
+                        responseObserver.onError(e);
+                    } finally {
+                        // 删除临时文件
+                        tempImageFile.delete();
+                    }
+                }
+            };
         } catch (IOException e) {
-            log.warn(" 镜像导入失败：{}", e.getMessage());
+            log.error("创建临时文件失败: {}", e.getMessage());
+            responseObserver.onError(e);
+            return new StreamObserver<>() {
+                @Override public void onNext(TaskAssignServiceProto.UpDockerImageChunkRequest value) {}
+                @Override public void onError(Throwable t) {}
+                @Override public void onCompleted() {}
+            };
         }
     }
 

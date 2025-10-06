@@ -1,7 +1,6 @@
 package com.gpu.rentaler.sys.monitor;
 
 import com.gpu.rentaler.entity.DContainerInfoResp;
-import com.gpu.rentaler.grpc.TaskAssignServiceProto;
 import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.model.Server;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
@@ -9,13 +8,11 @@ import com.gpu.rentaler.sys.service.ServerService;
 import jakarta.annotation.Resource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.core.io.AbstractResource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -42,11 +39,11 @@ public class DeviceTaskService {
 
             GrpcTaskAssignClient client = getGrpcTaskAssignClient(serverId);
 
-            TaskAssignServiceProto.DContainerInfoResp resp = client.upDockerImage(tempFile, deviceIndex);
-            return new DContainerInfoResp(resp.getContainerName(), resp.getContainerId());
-        } catch (IOException e) {
+            DContainerInfoResp resp = client.upDockerImageStream(tempFile, deviceIndex);
+            return new DContainerInfoResp(resp.containerName(), resp.containerId());
+        } catch (IOException | InterruptedException e) {
             log.warn("exportAndUpDockerImage error : {}", e.getMessage());
-            return new DContainerInfoResp("error" ,"error");
+            return new DContainerInfoResp("error", "error");
         } finally {
             // 使用完立即删除
             if (tempFile != null) {
@@ -73,12 +70,12 @@ public class DeviceTaskService {
         return tempFile;
     }
 
-    public String getLog(Long serverId, String containerId ,int num){
+    public String getLog(Long serverId, String containerId, int num) {
         GrpcTaskAssignClient client = getGrpcTaskAssignClient(serverId);
-        return client.getLog(num ,containerId);
+        return client.getLog(num, containerId);
     }
 
-    private GrpcTaskAssignClient getGrpcTaskAssignClient(Long serverId){
+    private GrpcTaskAssignClient getGrpcTaskAssignClient(Long serverId) {
         Server server = serverService.getById(serverId);
         int port = 50055;
         return new GrpcTaskAssignClient(server.getIpAddress(), port);

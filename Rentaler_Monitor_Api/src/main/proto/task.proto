@@ -8,12 +8,13 @@ option java_outer_classname = "TaskAssignServiceProto";
 import "google/protobuf/empty.proto";
 
 // ================================
-// 响应对象：容器信息
+// 响应对象：上传完成并启动容器
 // ================================
-message DContainerInfoResp {
-    string containerName = 1; // 容器名称
-    string containerId = 2;   // 容器ID
+message UpDockerImageChunkResp {
+    string containerName = 1; // 启动的容器名称
+    string containerId = 2;   // 启动的容器ID
 }
+
 
 // ================================
 // 请求对象：停止 Docker 容器
@@ -25,9 +26,13 @@ message StopDockerContainerRequest {
 // ================================
 // 请求对象：上传 Docker 镜像
 // ================================
-message UpDockerImageRequest {
-    bytes imageFile = 1;              // Docker 镜像文件内容
-    repeated int32 deviceIndexs = 2;  // GPU 设备索引列表
+// ================================
+// 请求对象：上传 Docker 镜像分片
+// ================================
+message UpDockerImageChunkRequest {
+    bytes chunkData = 1;               // 镜像数据分片
+    int32 deviceIndex = 2;             // 对应 GPU 设备索引
+    bool isLastChunk = 3;              // 是否是最后一片
 }
 
 // ================================
@@ -83,8 +88,8 @@ service TaskAssignService {
     // 停止指定 Docker 容器
     rpc StopDockerContainer(StopDockerContainerRequest) returns (google.protobuf.Empty);
 
-    // 上传 Docker 镜像并启动容器，返回容器信息
-    rpc UpDockerImage(UpDockerImageRequest) returns (DContainerInfoResp);
+    // 上传 Docker 镜像分片并启动容器（客户端流）
+    rpc UpDockerImageStream(stream UpDockerImageChunkRequest) returns (UpDockerImageChunkResp);
 
     // 获取容器最新日志
     rpc GetLog(GetLogRequest) returns (GetLogResp);
