@@ -4,6 +4,7 @@ import com.google.protobuf.Empty;
 import com.google.protobuf.Timestamp;
 import com.gpu.rentaler.grpc.MonitorServiceGrpc;
 import com.gpu.rentaler.grpc.MonitorServiceProto;
+import com.gpu.rentaler.infra.service.AsyncService;
 import com.gpu.rentaler.sys.model.Server;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
 import com.gpu.rentaler.sys.service.GPUProcessActivityService;
@@ -37,6 +38,8 @@ public class GrpcDeviceMonitorService extends MonitorServiceGrpc.MonitorServiceI
     @Resource
     private GPUProcessActivityService gpuProcessActivityService;
 
+    @Resource
+    private AsyncService asyncService;
 
     @Override
     public void reportServerInfo(MonitorServiceProto.ServerInfo request, StreamObserver<MonitorServiceProto.Int64Value> responseObserver) {
@@ -63,7 +66,7 @@ public class GrpcDeviceMonitorService extends MonitorServiceGrpc.MonitorServiceI
 
     @Override
     public void updateServerInfo(MonitorServiceProto.ServerInfo request, StreamObserver<Empty> responseObserver) {
-        asyncExecute(() -> {
+        asyncService.asyncExecute(() -> {
             serverService.updateServerInfo(
                 request.getServerId(),
                 request.getHostname(),
@@ -87,7 +90,7 @@ public class GrpcDeviceMonitorService extends MonitorServiceGrpc.MonitorServiceI
 
     @Override
     public void reportProcessMsg(MonitorServiceProto.ReportProcessMsgRequest request, StreamObserver<Empty> responseObserver) {
-        asyncExecute(() -> {
+        asyncService.asyncExecute(() -> {
             long serverId = request.getServerId();
             serverHeartBeatRecord.recordHeartBeat(serverId);
 
@@ -104,10 +107,5 @@ public class GrpcDeviceMonitorService extends MonitorServiceGrpc.MonitorServiceI
         });
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
-    }
-
-    @Async("IOTaskExecutor")
-    public void asyncExecute(Runnable task) {
-        task.run();
     }
 }

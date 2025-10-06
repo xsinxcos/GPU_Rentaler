@@ -410,7 +410,6 @@ public class DockerExecutor {
     public static String loadImageFromInputStream(InputStream inputStream) throws IOException {
         File file = writeToTempFile(inputStream, "temp-", ".tar");
         try {
-            // 2. 创建临时文件
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ByteArrayOutputStream errorStream = new ByteArrayOutputStream();
 
@@ -418,33 +417,40 @@ public class DockerExecutor {
 
             DefaultExecutor executor = new DefaultExecutor();
             executor.setStreamHandler(new PumpStreamHandler(outputStream, errorStream, inputStream));
-
             executor.setExitValues(null);
 
-            int exitCode;
             try {
                 logger.debug("开始导入Docker镜像...");
                 executor.execute(cmdLine);
             } catch (ExecuteException e) {
-                exitCode = e.getExitValue();
+                int exitCode = e.getExitValue();
                 logger.warn("docker load 执行失败，退出码: {}", exitCode);
             }
 
             String output = outputStream.toString().trim();
+            logger.debug("docker load 输出: \n{}", output);
 
-            // 解析镜像名
-            Pattern pattern = Pattern.compile("Loaded image:\\s*(.+)");
-            Matcher matcher = pattern.matcher(output);
-            if (matcher.find()) {
-                return matcher.group(1).trim(); // ✅ 提取镜像名
+            // 优先匹配 Loaded image（镜像名）
+            Pattern namePattern = Pattern.compile("Loaded image:\\s*(.+)");
+            Matcher nameMatcher = namePattern.matcher(output);
+            if (nameMatcher.find()) {
+                return nameMatcher.group(1).trim();
             }
 
-            logger.warn("未能从输出中提取镜像名，原始输出: {}", output);
+            // 如果没有镜像名，匹配 Loaded image ID（镜像 ID）
+            Pattern idPattern = Pattern.compile("Loaded image ID:\\s*(sha256:[a-f0-9]{64})");
+            Matcher idMatcher = idPattern.matcher(output);
+            if (idMatcher.find()) {
+                return idMatcher.group(1).trim(); // 直接作为镜像“名”返回，用于后续 docker run
+            }
+
+            logger.warn("未能从输出中提取镜像名或ID，原始输出: {}", output);
             return null;
-        }finally {
+        } finally {
             file.delete();
         }
     }
+
 
     public static File writeToTempFile(InputStream inputStream, String prefix, String suffix) throws IOException {
         // 创建临时文件

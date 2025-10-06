@@ -6,7 +6,6 @@ import com.gpu.rentaler.sys.model.GPUTask;
 import com.gpu.rentaler.sys.model.TaskBilled;
 import com.gpu.rentaler.sys.service.*;
 import jakarta.annotation.Resource;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +38,6 @@ public class BillingSettleService {
     /**
      * 一分钟 结算一次费用
      */
-    @Transactional
     @Scheduled(fixedRate = 10 * 1000) // 10秒
     public void executeTask() {
         List<GPUTask> allRunningTask = gpuTaskService.getAllRunningTask();
@@ -50,7 +48,7 @@ public class BillingSettleService {
                 time = taskBilled.get().getEndBillTime();
             }
             List<GPUProcessActivity> allAfterTime = activityService.getAllAfterTime(task.getDeviceId(), time);
-            if(allAfterTime.isEmpty()) continue;
+            if (allAfterTime.isEmpty()) continue;
             List<GPUProcessActivity> activities = keepUniqueByRecordId(allAfterTime);
             long costTimeSecond = costTimeSecond(activities);
             BigDecimal cost = getCostByHourlyRate(task.getHourlyRate(), costTimeSecond);
@@ -59,47 +57,41 @@ public class BillingSettleService {
 
             Instant beginTime = getBeginTime(activities);
             Instant endTime = getEndTime(activities);
-            taskBilledService.save(task.getUserId() ,task.getId() ,beginTime ,endTime ,cost);
+            taskBilledService.save(task.getUserId(), task.getId(), beginTime, endTime, cost);
 
             // 欠费超过 20 ，强制停止任务
-            if(nowBalance.compareTo(new BigDecimal(20)) < 0){
-                // 异步
-                asyncExecute(() -> {
-                    gpuTaskService.forceCancelTask(task.getId());
-                    GPUDevice device = gpuDeviceService.getByDeviceId(task.getDeviceId());
-                    // 释放设备
-                    gpuDeviceService.returnDevice(task.getDeviceId());
-                    // 停止容器
-                    deviceTaskService.stopContainer(device.getServerId(), task.getContainerId());
-                });
+            if (nowBalance.compareTo(new BigDecimal(20)) < 0) {
+                gpuTaskService.forceCancelTask(task.getId());
+                GPUDevice device = gpuDeviceService.getByDeviceId(task.getDeviceId());
+                // 释放设备
+                gpuDeviceService.returnDevice(task.getDeviceId());
+                // 停止容器
+                deviceTaskService.stopContainer(device.getServerId(), task.getContainerId());
             }
         }
     }
 
-    @Async("IOTaskExecutor")
-    public void asyncExecute(Runnable task) {
-        task.run();
-    }
 
-    private Instant getBeginTime(List<GPUProcessActivity> activities){
+    private Instant getBeginTime(List<GPUProcessActivity> activities) {
         GPUProcessActivity min = activities.getFirst();
         for (GPUProcessActivity activity : activities) {
-            if(activity.getTime().compareTo(min.getTime()) < 0){
+            if (activity.getTime().compareTo(min.getTime()) < 0) {
                 min = activity;
             }
         }
         return min.getTime().minusSeconds(min.getDuration());
     }
 
-    private Instant getEndTime(List<GPUProcessActivity> activities){
+    private Instant getEndTime(List<GPUProcessActivity> activities) {
         GPUProcessActivity max = activities.getFirst();
         for (GPUProcessActivity activity : activities) {
-            if(activity.getTime().compareTo(max.getTime()) > 0){
+            if (activity.getTime().compareTo(max.getTime()) > 0) {
                 max = activity;
             }
         }
         return max.getTime();
     }
+
     /**
      * 根据每小时费率和秒数计算总费用，结果保留小数点后4位
      *

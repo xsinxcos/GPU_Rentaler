@@ -3,6 +3,7 @@ package com.gpu.rentaler.controller;
 import com.gpu.rentaler.common.Constants;
 import com.gpu.rentaler.common.SessionItemHolder;
 import com.gpu.rentaler.common.authz.RequiresPermissions;
+import com.gpu.rentaler.infra.service.AsyncService;
 import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.model.GPUTask;
 import com.gpu.rentaler.sys.monitor.DeviceTaskService;
@@ -44,6 +45,9 @@ public class TaskController {
 
     @Resource
     private TaskBilledService taskBilledService;
+
+    @Resource
+    private AsyncService asyncService;
 
     @RequiresPermissions("task:me")
     @GetMapping("/me")
@@ -87,18 +91,17 @@ public class TaskController {
         UserinfoDTO userInfo = (UserinfoDTO) SessionItemHolder.getItem(Constants.SESSION_CURRENT_USER);
         Optional<GPUTask> gpuTask = gpuTaskService.getById(taskId);
 
-        if (gpuTask.isPresent()) {
-            GPUTask item = gpuTask.get();
-            if (item.getUserId().equals(userInfo.userId())) {
+        gpuTask.ifPresent(task -> asyncService.asyncExecute(() -> {
+            if (task.getUserId().equals(userInfo.userId())) {
                 BigDecimal sumCost = taskBilledService.getAllCostByTaskId(taskId);
-                gpuTaskService.finishTask(taskId ,sumCost);
-                GPUDevice device = gpuDeviceService.getByDeviceId(item.getDeviceId());
+                gpuTaskService.finishTask(taskId, sumCost);
+                GPUDevice device = gpuDeviceService.getByDeviceId(task.getDeviceId());
                 // 释放设备
-                gpuDeviceService.returnDevice(item.getDeviceId());
-                deviceTaskService.stopContainer(device.getServerId(), item.getContainerId());
-                deviceTaskService.deleteContainer(device.getServerId(), item.getContainerId());
+                gpuDeviceService.returnDevice(task.getDeviceId());
+                deviceTaskService.stopContainer(device.getServerId(), task.getContainerId());
+                deviceTaskService.deleteContainer(device.getServerId(), task.getContainerId());
             }
-        }
+        }));
         return ResponseEntity.ok().build();
     }
 

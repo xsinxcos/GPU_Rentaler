@@ -5,6 +5,7 @@ import com.gpu.rentaler.common.Constants;
 import com.gpu.rentaler.common.SessionItemHolder;
 import com.gpu.rentaler.common.authz.RequiresPermissions;
 import com.gpu.rentaler.entity.DContainerInfoResp;
+import com.gpu.rentaler.infra.service.AsyncService;
 import com.gpu.rentaler.sys.constant.TaskStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.monitor.DeviceTaskService;
@@ -48,6 +49,9 @@ public class GPUDeviceController {
 
     @Resource
     private StorageService storageService;
+
+    @Resource
+    private AsyncService asyncService;
 
     @RequiresPermissions("gpu:release")
     @DeleteMapping("/{deviceId}/release")
@@ -95,7 +99,7 @@ public class GPUDeviceController {
         final LeaseGPUDeviceDTO[] dto = new LeaseGPUDeviceDTO[1];
         lease.ifPresentOrElse(device -> {
             UserinfoDTO userInfo = (UserinfoDTO) SessionItemHolder.getItem(Constants.SESSION_CURRENT_USER);
-            asyncExecute(() -> {
+            asyncService.asyncExecute(() -> {
                 org.springframework.core.io.Resource resource = storageService.loadAsResource(key);
                 try {
                     InputStream inputStream = resource.getInputStream();
@@ -114,11 +118,6 @@ public class GPUDeviceController {
             dto[0] = new LeaseGPUDeviceDTO(false, "已被租用，请重新选择设备");
         });
         return ResponseEntity.ok(dto[0]);
-    }
-
-    @Async("IOTaskExecutor")
-    protected void asyncExecute(Runnable task) {
-        task.run();
     }
 
     public record LeaseGPUDeviceDTO(boolean isSuccess, String msg) {
