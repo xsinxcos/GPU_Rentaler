@@ -1,7 +1,10 @@
 package com.gpu.rentaler.sys.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.DynamicInsert;
 
 import java.time.Instant;
@@ -18,11 +21,25 @@ public class GPUProcessActivity extends BaseEntity{
 
     private Instant time;
 
-    public GPUProcessActivity(String deviceId, Long pid, String processName, Instant time) {
+    private Long duration;
+
+    private String recordId;
+
+    public GPUProcessActivity(String deviceId, Long pid, String processName, Instant time, Long duration, String recordId) {
         this.deviceId = deviceId;
         this.pid = pid;
         this.processName = processName;
         this.time = time;
+        this.duration = duration;
+        this.recordId = recordId;
+    }
+
+    public String getRecordId() {
+        return recordId;
+    }
+
+    public void setRecordId(String recordId) {
+        this.recordId = recordId;
     }
 
     public GPUProcessActivity() {
@@ -61,4 +78,11 @@ public class GPUProcessActivity extends BaseEntity{
         this.time = time;
     }
 
+    public Long getDuration() {
+        return duration;
+    }
+
+    public void setDuration(Long duration) {
+        this.duration = duration;
+    }
 }

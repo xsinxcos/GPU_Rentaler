@@ -18,8 +18,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @GrpcService
 @Service
@@ -91,12 +90,15 @@ public class GrpcDeviceMonitorService extends MonitorServiceGrpc.MonitorServiceI
         asyncExecute(() -> {
             long serverId = request.getServerId();
             serverHeartBeatRecord.recordHeartBeat(serverId);
+
             List<MonitorServiceProto.ProcessInfo> processInfos = request.getProcessInfosList();
+            String recordId = UUID.randomUUID().toString();
             processInfos.forEach(item ->
                 {
                     Timestamp time = item.getTime();
                     Instant instant = Instant.ofEpochSecond(time.getSeconds(), time.getNanos());
-                    gpuProcessActivityService.saveActivity(item.getPid(), item.getName(), item.getDeviceId(), instant);
+                    gpuProcessActivityService.saveActivity(item.getPid(), item.getName(),
+                        item.getDeviceId(), instant, item.getDurationSeconds() ,recordId);
                 }
             );
         });

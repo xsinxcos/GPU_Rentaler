@@ -18,7 +18,7 @@ public class TaskBilledService {
     }
 
     public Optional<TaskBilled> getLastByTaskId(Long taskId){
-        return taskBilledRepository.findFirstByTaskIdOrderByEndBillTimeAsc(taskId);
+        return taskBilledRepository.findFirstByTaskIdOrderByEndBillTimeDesc(taskId);
     }
 
     public void save(Long userId , Long taskId, Instant startTime, Instant endTime , BigDecimal cost){

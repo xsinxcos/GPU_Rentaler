@@ -8,12 +8,13 @@ import com.gpu.rentaler.sys.model.GPUTask;
 import com.gpu.rentaler.sys.monitor.DeviceTaskService;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
 import com.gpu.rentaler.sys.service.GPUTaskService;
-import com.gpu.rentaler.sys.service.ServerService;
+import com.gpu.rentaler.sys.service.WalletService;
 import com.gpu.rentaler.sys.service.dto.GPUTaskDTO;
 import com.gpu.rentaler.sys.service.dto.PageDTO;
 import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.Resource;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -36,7 +37,7 @@ public class TaskController {
     private GPUDeviceService gpuDeviceService;
 
     @Resource
-    private ServerService serverService;
+    private WalletService walletService;
 
     @RequiresPermissions("task:me")
     @GetMapping("/me")
@@ -88,7 +89,7 @@ public class TaskController {
                 // 释放设备
                 gpuDeviceService.returnDevice(item.getDeviceId());
                 deviceTaskService.stopContainer(device.getServerId(), item.getContainerId());
-                deviceTaskService.deleteContainer(device.getServerId() ,item.getContainerId());
+                deviceTaskService.deleteContainer(device.getServerId(), item.getContainerId());
             }
         }
         return ResponseEntity.ok().build();
@@ -100,6 +101,13 @@ public class TaskController {
         Long taskId = req.taskId;
         String path = req.path;
         UserinfoDTO userInfo = (UserinfoDTO) SessionItemHolder.getItem(Constants.SESSION_CURRENT_USER);
+
+        if (walletService.isArrears(userInfo.userId())) {
+            String msg = "余额为负，不支持导出数据";
+            ByteArrayResource resource = new ByteArrayResource(msg.getBytes());
+            return ResponseEntity.ok(resource);
+        }
+
         Optional<GPUTask> gpuTask = gpuTaskService.getById(taskId);
         org.springframework.core.io.Resource resp = null;
         if (gpuTask.isPresent()) {

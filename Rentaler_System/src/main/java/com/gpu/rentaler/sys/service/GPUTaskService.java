@@ -93,6 +93,18 @@ public class GPUTaskService {
         }
     }
 
+    public void forceCancelTask(Long taskId) {
+        Optional<GPUTask> gpuTask = gpuTaskRepository.findById(taskId);
+        if (gpuTask.isPresent()) {
+            GPUTask task = gpuTask.get();
+            Instant endTime = Instant.now();
+            task.setEndTime(endTime);
+            task.setActualDurationHours(getDur(task.getStartTime() ,task.getEndTime()));
+            task.setStatus(TaskStatus.CANCELLED);
+            gpuTaskRepository.save(task);
+        }
+    }
+
     private BigDecimal getDur(Instant t1, Instant t2) {
         Duration duration = Duration.between(t1, t2);
 

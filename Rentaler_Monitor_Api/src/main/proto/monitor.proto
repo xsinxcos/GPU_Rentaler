@@ -22,9 +22,9 @@ message ProcessInfo {
     string pid = 1;
     string name = 2;
     string deviceId = 3;
-    string usedMemoryMB = 4;
     string containerId = 5;
     google.protobuf.Timestamp time = 6;
+    int64 durationSeconds = 7;
 }
 
 // ServerInfo 对应 Java 实体

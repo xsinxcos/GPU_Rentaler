@@ -55,10 +55,10 @@ public class GrpcProcessTaskService {
                 MonitorServiceProto.ProcessInfo info = MonitorServiceProto.ProcessInfo.newBuilder()
                     .setPid(processInfo.getPid())
                     .setContainerId(processInfo.getContainerId())
-                    .setDeviceId(processInfo.getPid())
+                    .setDeviceId(processInfo.getDeviceId())
                     .setName(processInfo.getName())
-                    .setUsedMemoryMB(processInfo.getUsedMemoryMB())
                     .setTime(timestamp)
+                    .setDurationSeconds(10)
                     .build();
                 grpcProInfo.add(info);
             }

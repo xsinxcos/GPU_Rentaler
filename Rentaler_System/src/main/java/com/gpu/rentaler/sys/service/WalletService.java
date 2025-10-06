@@ -35,4 +35,18 @@ public class WalletService {
         wallet.setBalance(balance.add(new BigDecimal(amount)));
         walletRepository.save(wallet);
     }
+
+    public BigDecimal cost(Long userId ,BigDecimal cost){
+        Wallet wallet = walletRepository.getWalletByUserId(userId);
+        BigDecimal balance = wallet.getBalance();
+        BigDecimal res = balance.subtract(cost);
+        wallet.setBalance(res);
+        walletRepository.save(wallet);
+        return wallet.getBalance();
+    }
+
+    public boolean isArrears(Long userId) {
+        Wallet wallet = walletRepository.getWalletByUserId(userId);
+        return wallet.getBalance().compareTo(new BigDecimal(0)) < 0;
+    }
 }
