@@ -30,4 +30,13 @@ public class TaskBilledService {
         taskBilled.setEndBillTime(endTime);
         taskBilledRepository.save(taskBilled);
     }
+
+    public BigDecimal getAllCostByTaskId(Long taskId){
+        BigDecimal sum = new BigDecimal(0);
+        List<TaskBilled> byTaskId = taskBilledRepository.findTaskBilledByTaskId(taskId);
+        for (TaskBilled taskBilled : byTaskId) {
+            sum = sum.add(taskBilled.getCost());
+        }
+        return sum;
+    }
 }

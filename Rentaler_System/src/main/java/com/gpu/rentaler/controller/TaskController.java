@@ -8,6 +8,7 @@ import com.gpu.rentaler.sys.model.GPUTask;
 import com.gpu.rentaler.sys.monitor.DeviceTaskService;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
 import com.gpu.rentaler.sys.service.GPUTaskService;
+import com.gpu.rentaler.sys.service.TaskBilledService;
 import com.gpu.rentaler.sys.service.WalletService;
 import com.gpu.rentaler.sys.service.dto.GPUTaskDTO;
 import com.gpu.rentaler.sys.service.dto.PageDTO;
@@ -16,10 +17,12 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.Resource;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @RestController
@@ -38,6 +41,9 @@ public class TaskController {
 
     @Resource
     private WalletService walletService;
+
+    @Resource
+    private TaskBilledService taskBilledService;
 
     @RequiresPermissions("task:me")
     @GetMapping("/me")
@@ -84,7 +90,8 @@ public class TaskController {
         if (gpuTask.isPresent()) {
             GPUTask item = gpuTask.get();
             if (item.getUserId().equals(userInfo.userId())) {
-                gpuTaskService.finishTask(taskId);
+                BigDecimal sumCost = taskBilledService.getAllCostByTaskId(taskId);
+                gpuTaskService.finishTask(taskId ,sumCost);
                 GPUDevice device = gpuDeviceService.getByDeviceId(item.getDeviceId());
                 // 释放设备
                 gpuDeviceService.returnDevice(item.getDeviceId());
@@ -104,8 +111,7 @@ public class TaskController {
 
         if (walletService.isArrears(userInfo.userId())) {
             String msg = "余额为负，不支持导出数据";
-            ByteArrayResource resource = new ByteArrayResource(msg.getBytes());
-            return ResponseEntity.ok(resource);
+            throw new RuntimeException(msg);
         }
 
         Optional<GPUTask> gpuTask = gpuTaskService.getById(taskId);
@@ -118,7 +124,16 @@ public class TaskController {
             }
         }
         MediaType tarGz = MediaType.parseMediaType("application/gzip");
-        return ResponseEntity.ok().contentType(tarGz).body(resp);
+        if (resp != null) {
+            return ResponseEntity.ok().contentType(tarGz)
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=\"" + resp.getFilename() + "\"")
+                .body(resp);
+        }
+        return ResponseEntity.ok().contentType(tarGz)
+            .header(HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=无")
+            .body(null);
     }
 
     public record ExportDataReq(Long taskId, String path) {

@@ -81,7 +81,7 @@ public class GPUTaskService {
         return gpuTaskRepository.findById(id);
     }
 
-    public void finishTask(Long taskId) {
+    public void finishTask(Long taskId ,BigDecimal sumCost) {
         Optional<GPUTask> gpuTask = gpuTaskRepository.findById(taskId);
         if (gpuTask.isPresent()) {
             GPUTask task = gpuTask.get();
@@ -89,6 +89,7 @@ public class GPUTaskService {
             task.setEndTime(endTime);
             task.setActualDurationHours(getDur(task.getStartTime() ,task.getEndTime()));
             task.setStatus(TaskStatus.COMPLETED);
+            task.setTotalCost(sumCost);
             gpuTaskRepository.save(task);
         }
     }
