@@ -99,6 +99,7 @@ public class GPUDeviceService {
         return gpuDeviceRepository.findAllById(ids);
     }
 
+    @Transactional
     public void deleteByDeviceId(String deviceId) {
         gpuDeviceRepository.deleteByDeviceId(deviceId);
     }

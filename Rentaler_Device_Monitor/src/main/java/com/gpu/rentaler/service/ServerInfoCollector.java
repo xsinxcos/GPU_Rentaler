@@ -1,11 +1,13 @@
 package com.gpu.rentaler.service;
 
+import com.gpu.rentaler.config.IPProperties;
 import com.gpu.rentaler.entity.ServerInfo;
 import jakarta.annotation.Resource;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -32,6 +34,8 @@ public class ServerInfoCollector {
     private static final boolean IS_LINUX = OS_NAME.contains("linux");
     private static final boolean IS_MAC = OS_NAME.contains("mac");
 
+    @Resource
+    private IPProperties ipProperties;
     @Resource
     private ServerIDManager serverIDManager;
 
@@ -120,6 +124,9 @@ public class ServerInfoCollector {
      * 获取IP地址
      */
     private String getIPAddress() {
+        if(StringUtils.hasText(ipProperties.getUrl())){
+            return ipProperties.getUrl();
+        }
         try {
             // 方法1: 获取本地主机地址
             String localIP = InetAddress.getLocalHost().getHostAddress();

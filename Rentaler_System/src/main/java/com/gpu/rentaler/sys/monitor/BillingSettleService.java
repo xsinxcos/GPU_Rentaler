@@ -43,7 +43,7 @@ public class BillingSettleService {
         List<GPUTask> allRunningTask = gpuTaskService.getAllRunningTask();
         for (GPUTask task : allRunningTask) {
             Optional<TaskBilled> taskBilled = taskBilledService.getLastByTaskId(task.getId());
-            Instant time = Instant.parse("1900-01-01T00:00:00Z");
+            Instant time = task.getStartTime();
             if (taskBilled.isPresent()) {
                 time = taskBilled.get().getEndBillTime();
             }

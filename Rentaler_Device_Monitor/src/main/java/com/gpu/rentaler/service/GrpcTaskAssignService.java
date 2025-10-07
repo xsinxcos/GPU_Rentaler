@@ -45,13 +45,24 @@ public class GrpcTaskAssignService extends TaskAssignServiceGrpc.TaskAssignServi
             // 用于保存 GPU 设备索引（假设所有分片的 deviceIndex 一致）
             final int[] deviceIndex = new int[1];
 
+            // 用于统计已接收的字节数
+            final long[] totalBytes = {0};
+
             return new StreamObserver<>() {
                 @Override
                 public void onNext(TaskAssignServiceProto.UpDockerImageChunkRequest chunkRequest) {
                     try {
                         // 写入分片数据到临时文件
+                        int chunkSize = chunkRequest.getChunkData().size();
                         chunkRequest.getChunkData().writeTo(fos);
+
+                        totalBytes[0] += chunkSize;
                         deviceIndex[0] = chunkRequest.getDeviceIndex();
+
+                        // 每接收 10MB 打印一次进度
+                        if (totalBytes[0] % (10 * 1024 * 1024) < chunkSize) {
+                            log.info("已接收镜像数据: {} MB", totalBytes[0] / (1024 * 1024));
+                        }
                     } catch (IOException e) {
                         log.error("写入镜像分片失败: {}", e.getMessage());
                         responseObserver.onError(e);
@@ -64,8 +75,7 @@ public class GrpcTaskAssignService extends TaskAssignServiceGrpc.TaskAssignServi
                     try {
                         fos.close();
                         tempImageFile.delete();
-                    } catch (IOException ignored) {
-                    }
+                    } catch (IOException ignored) {}
                 }
 
                 @Override
@@ -86,6 +96,7 @@ public class GrpcTaskAssignService extends TaskAssignServiceGrpc.TaskAssignServi
 
                             responseObserver.onNext(resp);
                             responseObserver.onCompleted();
+                            log.info("镜像上传完成，总大小: {} MB", totalBytes[0] / (1024 * 1024));
                         }
                     } catch (IOException e) {
                         log.error("镜像导入失败: {}", e.getMessage());
@@ -106,6 +117,7 @@ public class GrpcTaskAssignService extends TaskAssignServiceGrpc.TaskAssignServi
             };
         }
     }
+
 
     @Override
     public void getLog(TaskAssignServiceProto.GetLogRequest request, StreamObserver<TaskAssignServiceProto.GetLogResp> responseObserver) {
