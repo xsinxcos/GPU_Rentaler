@@ -1,7 +1,0 @@
-version: "3.9"  # Docker Compose 文件版本
-
-services:
-    myapp:          # 服务名称
-        image: ubuntu:22.04   # 使用的镜像
-        container_name: my_ubuntu_container
-        command: tail -f /dev/null   # 保持容器运行

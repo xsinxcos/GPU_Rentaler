@@ -34,32 +34,6 @@ server:
         context-path: /admin3
     port: 9090
 
-# Dubbo 配置
-dubbo:
-    # 注册中心配置
-    registry:
-        address: zookeeper://127.0.0.1:2181  # 注册中心地址，支持多个以逗号分隔
-        timeout: 60000  # 注册中心请求超时时间(毫秒)
-
-    # 协议配置
-    protocol:
-        name: dubbo  # 协议名称
-        port: 20881  # 服务端口，-1表示随机端口
-        serialization: hessian2  # 序列化方式
-
-    # 应用配置
-    application:
-        logger: slf4j  # 日志输出方式
-        qos-port: 33333
-
-    # 服务提供者配置
-    provider:
-        timeout: 3000  # 服务调用超时时间(毫秒)
-        retries: 0  # 服务调用重试次数
-        loadbalance: roundrobin  # 负载均衡策略
-
-    scan:
-        base-packages: com.gpu.rentaler.sys.monitor
 
 grpc:
     server:

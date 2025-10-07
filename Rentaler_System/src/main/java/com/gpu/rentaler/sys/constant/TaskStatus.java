@@ -1,6 +1,7 @@
 package com.gpu.rentaler.sys.constant;
 
 public interface TaskStatus {
+    String CREATING = "creating";
     String PENDING = "pending";
     String ACTIVE = "active";
     String COMPLETED = "completed";

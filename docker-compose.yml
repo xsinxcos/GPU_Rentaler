@@ -1,27 +1,31 @@
 version: '3.8'
 
 services:
-    # Spring Boot 应用
     rentaler-app:
         build:
             context: .
             dockerfile: Dockerfile
         container_name: rentaler-app
+
         ports:
-            - "9091:9090"    # 应用端口
-            - "20882:20881"  # Dubbo 端口
-            - "33334:33333"  # Dubbo QoS 端口
-            - "50051:50051" # grpc 端口
+            - "9091:9090"    # Spring Boot 应用端口
+            - "50051:50051"  # gRPC 通信端口
+
         environment:
-            # 数据库配置 - 连接宿主机 MySQL
+            # 数据库连接（宿主机）
             SPRING_DATASOURCE_URL: jdbc:mysql://host.docker.internal:3306/gpu_rentaler_0?characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true
             SPRING_DATASOURCE_USERNAME: root
             SPRING_DATASOURCE_PASSWORD: 123456
-            # Dubbo 配置 - 连接宿主机 Zookeeper
-            DUBBO_REGISTRY_ADDRESS: zookeeper://host.docker.internal:2181
+
             # JVM 参数
             JAVA_OPTS: -Xms512m -Xmx1024m -Dfile.encoding=UTF-8
+
+        volumes:
+            - "D:/docker-volumes/gpu/files:/app/files"     # 应用数据目录（如缓存、导出）
+
         extra_hosts:
             - "host.docker.internal:host-gateway"
+
         restart: unless-stopped
+
         network_mode: bridge

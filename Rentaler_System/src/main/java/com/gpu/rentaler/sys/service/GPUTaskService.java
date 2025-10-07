@@ -8,7 +8,6 @@ import com.gpu.rentaler.sys.service.dto.PageDTO;
 import jakarta.annotation.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,20 +24,33 @@ public class GPUTaskService {
 
 
     // 方法定义处修改参数名
-    public GPUTask saveGPURental(String deviceId, Long userId, Instant rentalStartTime,
-                                 BigDecimal hourlyRate, String rentalStatus, String containerId, String containerName) {
+    public GPUTask initGPUTask(String deviceId, Long userId, Instant rentalStartTime,
+                               BigDecimal hourlyRate, String rentalStatus) {
         GPUTask gpuRental = new GPUTask();
         gpuRental.setDeviceId(deviceId);
         gpuRental.setUserId(userId);
         gpuRental.setStartTime(rentalStartTime);
         gpuRental.setHourlyRate(hourlyRate);
         gpuRental.setStatus(rentalStatus);
-        gpuRental.setContainerId(containerId);
-        gpuRental.setContainerName(containerName);
 
         // 持久化操作
         return gpuTaskRepository.save(gpuRental);
     }
+
+    // 方法定义处修改参数名
+    public void runningGPUTask(Long id ,String status, String containerId ,String containerName) {
+        Optional<GPUTask> gpuTask = gpuTaskRepository.findById(id);
+        gpuTask.ifPresent(item -> {
+            item.setStatus(status);
+            item.setContainerId(containerId);
+            item.setContainerName(containerName);
+            gpuTaskRepository.save(item);
+        });
+    }
+
+
+
+
 
     public PageDTO<GPUTaskDTO> findByUserId(Pageable pageable, Long userId, String status) {
         Page<GPUTask> gpuTasks = gpuTaskRepository.findPageByUserIdAndStatus(userId, status, pageable);

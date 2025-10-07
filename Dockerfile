@@ -1,33 +1,36 @@
-# 构建阶段
+# ---------- 构建阶段 ----------
 FROM maven:3.8.8-eclipse-temurin-21-alpine AS build
 
+# 设置工作目录
 WORKDIR /app
+
+# 复制 Maven 配置和模块源码
 COPY pom.xml .
 COPY Rentaler_Device_Monitor ./Rentaler_Device_Monitor
 COPY Rentaler_Monitor_Api ./Rentaler_Monitor_Api
 COPY Rentaler_System ./Rentaler_System
 
-# 构建应用（跳过测试）
+# 构建 jar（跳过测试，加快速度）
 #RUN mvn clean package -DskipTests
 
-# 运行阶段
+# ---------- 运行阶段 ----------
 FROM eclipse-temurin:21-jre-alpine-3.22
 
-# 设置工作目录
+# 设置运行目录
 WORKDIR /app
 
-# 复制构建好的 jar 包
+# 创建挂载点（与 docker-compose 中 volumes 配合）
+RUN mkdir -p /app/logs /app/config /app/data
+
+# 拷贝构建好的 jar 包
 COPY --from=build /app/Rentaler_System/target/*.jar app.jar
 
-# 暴露应用端口
-EXPOSE 9091
-# 暴露 Dubbo 端口
-EXPOSE 20881
-# 暴露 Dubbo QoS 端口
-EXPOSE 33333
+# 开放端口（可选）
+EXPOSE 9090
+EXPOSE 50051
 
-# 设置环境变量
+# 设置 JVM 参数变量
 ENV JAVA_OPTS="-Xms512m -Xmx1024m -Dfile.encoding=UTF-8"
 
-# 启动应用
+# 启动服务
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

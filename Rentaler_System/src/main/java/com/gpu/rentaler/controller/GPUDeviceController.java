@@ -8,6 +8,7 @@ import com.gpu.rentaler.entity.DContainerInfoResp;
 import com.gpu.rentaler.infra.service.AsyncService;
 import com.gpu.rentaler.sys.constant.TaskStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
+import com.gpu.rentaler.sys.model.GPUTask;
 import com.gpu.rentaler.sys.monitor.DeviceTaskService;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
 import com.gpu.rentaler.sys.service.GPUTaskService;
@@ -23,7 +24,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -91,8 +91,8 @@ public class GPUDeviceController {
     @PostMapping("/{deviceId}/lease")
     public ResponseEntity<LeaseGPUDeviceDTO> leaseGPUDevice(@NotNull String key, @PathVariable String deviceId) {
         boolean isTar = storageService.checkTar(key);
-        if(!isTar){
-            return ResponseEntity.ok(new LeaseGPUDeviceDTO(false ,"租用失败，资源不符合要求"));
+        if (!isTar) {
+            return ResponseEntity.ok(new LeaseGPUDeviceDTO(false, "租用失败，资源不符合要求"));
         }
         // 租用GPU设备的逻辑
         Optional<GPUDevice> lease = gpuDeviceService.lease(deviceId);
@@ -105,18 +105,16 @@ public class GPUDeviceController {
                     InputStream inputStream = resource.getInputStream();
                     List<String> devices = new ArrayList<>();
                     devices.add(deviceId);
+                    GPUTask task = gpuTaskService.initGPUTask(deviceId, userInfo.userId(), Instant.now(), device.getHourlyRate(), TaskStatus.CREATING);
                     DContainerInfoResp infoResp = deviceTaskService.importAndUpDockerImage(
                         inputStream, device.getServerId(), devices);
-                    gpuTaskService.saveGPURental(deviceId, userInfo.userId(), Instant.now(), device.getHourlyRate(), TaskStatus.ACTIVE,
-                        infoResp.containerId(), infoResp.containerName());
+                    gpuTaskService.runningGPUTask(task.getId(), TaskStatus.ACTIVE, infoResp.containerId(), infoResp.containerName());
                 } catch (IOException e) {
                     log.warn("{} 镜像运行失败：{}", resource.getFilename(), e.getMessage());
                 }
             });
             dto[0] = new LeaseGPUDeviceDTO(true, "成功租用");
-        }, () -> {
-            dto[0] = new LeaseGPUDeviceDTO(false, "已被租用，请重新选择设备");
-        });
+        }, () -> dto[0] = new LeaseGPUDeviceDTO(false, "已被租用，请重新选择设备"));
         return ResponseEntity.ok(dto[0]);
     }
 

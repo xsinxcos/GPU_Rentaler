@@ -1,9 +1,0 @@
-version: '3.8'
-
-services:
-    ssh-container:
-        build: .
-        container_name: ssh-container
-        ports:
-            - "2222:22"  # 将宿主机2222端口映射到容器22端口
-        restart: unless-stopped
