@@ -71,8 +71,7 @@ public class GrpcStartupService implements CommandLineRunner {
             deviceInfosProtos.add(deviceInfoProto);
         }
 
-        return MonitorServiceProto.ServerInfo.newBuilder()
-            .setServerId(serverInfo.getServerId())
+        MonitorServiceProto.ServerInfo.Builder builder = MonitorServiceProto.ServerInfo.newBuilder()
             .setHostname(serverInfo.getHostname())
             .setIpAddress(serverInfo.getIpAddress())
             .setCpuModel(serverInfo.getCpuModel())
@@ -80,7 +79,12 @@ public class GrpcStartupService implements CommandLineRunner {
             .setRamTotalGb(serverInfo.getRamTotalGb())
             .setStorageTotalGb(serverInfo.getStorageTotalGb())
             .setGpuSlots(serverInfo.getGpuSlots())
-            .addAllGpuDeviceInfos(deviceInfosProtos)
-            .build();
+            .addAllGpuDeviceInfos(deviceInfosProtos);
+
+        if (serverInfo.getServerId() != null) {
+            builder.setServerId(serverInfo.getServerId());
+        }
+
+        return builder.build();
     }
 }

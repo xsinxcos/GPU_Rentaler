@@ -47,6 +47,7 @@ public class GPUDeviceService {
         for (BasicGPUDeviceDTO updateDevice : updateDevices) {
             GPUDevice existingDevice = existingDeviceMap.get(updateDevice.deviceId());
             existingDevice.setServerId(serverId);
+            existingDevice.setDeviceId(updateDevice.deviceId());
             existingDevice.setMemoryTotal(updateDevice.memoryTotal());
             existingDevice.setDeviceIndex(updateDevice.deviceIndex());
             existingDevice.setBrand(updateDevice.brand());
@@ -59,6 +60,7 @@ public class GPUDeviceService {
         for (BasicGPUDeviceDTO saveDevice : saveDevices) {
             GPUDevice newDevice = new GPUDevice();
             newDevice.setServerId(serverId);
+            newDevice.setDeviceId(saveDevice.deviceId());
             newDevice.setMemoryTotal(saveDevice.memoryTotal());
             newDevice.setDeviceIndex(saveDevice.deviceIndex());
             newDevice.setBrand(saveDevice.brand());
