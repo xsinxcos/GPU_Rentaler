@@ -39,17 +39,18 @@ public class GrpcTaskAssignClient {
 
     /**
      * 自适应背压控制版本（动态调整读取速度）- 使用 Log 打印
+     * @param inputStream 输入流（注意：此方法不会关闭该流，调用方负责关闭）
+     * @param fileName 文件名
+     * @param totalSize 文件总大小（字节）
+     * @param deviceIndexes 设备索引列表
      */
-    public DContainerInfoResp upDockerImageStream(Path imageFilePath, List<Integer> deviceIndexes)
+    public DContainerInfoResp upDockerImageStream(InputStream inputStream, String fileName, long totalSize, List<Integer> deviceIndexes)
         throws IOException, InterruptedException {
 
         int deviceIndex = deviceIndexes.getFirst();
         CountDownLatch latch = new CountDownLatch(1);
         DContainerInfoResp[] resultHolder = new DContainerInfoResp[1];
         Throwable[] errorHolder = new Throwable[1];
-
-        long totalSize = Files.size(imageFilePath);
-        String fileName = imageFilePath.getFileName().toString();
 
         BufferPoolMXBean directPool = DirectMemoryMonitor.getDirectBufferPool();
         long initialDirectMemory = directPool != null ? directPool.getMemoryUsed() : 0;
@@ -101,10 +102,10 @@ public class GrpcTaskAssignClient {
 
             byte[] buffer = new byte[chunkSize];
 
-            try (InputStream fis = Files.newInputStream(imageFilePath)) {
+            try {
                 int bytesRead;
 
-                while ((bytesRead = fis.read(buffer)) != -1) {
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
                     // 🔥 自适应背压控制
                     if (directPool != null) {
                         long currentDirect = directPool.getMemoryUsed();
@@ -308,16 +309,4 @@ public class GrpcTaskAssignClient {
         }
     }
 
-
-    public static void main(String[] args) throws IOException, InterruptedException {
-        GrpcTaskAssignClient client = new GrpcTaskAssignClient("localhost", 50055);
-
-        // 示例：上传镜像启动容器
-        Path imagePath = Path.of("files/ub669_my_image.tar");
-        DContainerInfoResp resp = client.upDockerImageStream(imagePath, List.of(0));
-        System.out.println("Container started: " + resp.containerId() + ", ID: " + resp.containerName());
-
-        // 示例：停止容器
-        //client.stopDockerContainer(resp.getContainerId());
-    }
 }

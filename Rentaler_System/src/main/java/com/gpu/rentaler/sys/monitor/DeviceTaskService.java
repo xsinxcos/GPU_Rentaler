@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,25 +30,17 @@ public class DeviceTaskService {
     private GPUDeviceService gpuDeviceService;
 
 
-    public DContainerInfoResp importAndUpDockerImage(InputStream image, Long serverId, List<String> deviceIds) throws IOException {
-        Path tempFile = null;
+    public DContainerInfoResp importAndUpDockerImage(InputStream stream ,String filename ,long contentLength, Long serverId, List<String> deviceIds) throws IOException {
         try {
             List<GPUDevice> devices = gpuDeviceService.getByDeviceIds(deviceIds);
             List<Integer> deviceIndex = devices.stream().map(GPUDevice::getDeviceIndex).collect(Collectors.toList());
-            tempFile = writeInputStreamToTempFile(image, ".tar");
 
             GrpcTaskAssignClient client = getGrpcTaskAssignClient(serverId);
-
-            DContainerInfoResp resp = client.upDockerImageStream(tempFile, deviceIndex);
+            DContainerInfoResp resp = client.upDockerImageStream(stream,filename ,contentLength , deviceIndex);
             return new DContainerInfoResp(resp.containerName(), resp.containerId());
         } catch (IOException | InterruptedException e) {
             log.warn("exportAndUpDockerImage error : {}", e.getMessage());
             return new DContainerInfoResp("error", "error");
-        } finally {
-            // 使用完立即删除
-            if (tempFile != null) {
-                Files.deleteIfExists(tempFile);
-            }
         }
     }
 

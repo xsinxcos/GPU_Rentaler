@@ -4,6 +4,7 @@ package com.gpu.rentaler.controller;
 import com.gpu.rentaler.common.Constants;
 import com.gpu.rentaler.common.SessionItemHolder;
 import com.gpu.rentaler.common.authz.RequiresPermissions;
+import com.gpu.rentaler.sys.model.StorageFile;
 import com.gpu.rentaler.sys.monitor.DContainerInfoResp;
 import com.gpu.rentaler.infra.service.AsyncService;
 import com.gpu.rentaler.sys.constant.TaskStatus;
@@ -101,13 +102,13 @@ public class GPUDeviceController {
             UserinfoDTO userInfo = (UserinfoDTO) SessionItemHolder.getItem(Constants.SESSION_CURRENT_USER);
             asyncService.asyncExecute(() -> {
                 org.springframework.core.io.Resource resource = storageService.loadAsResource(key);
+                StorageFile file = storageService.getByKey(key);
                 try {
-                    InputStream inputStream = resource.getInputStream();
                     List<String> devices = new ArrayList<>();
                     devices.add(deviceId);
                     GPUTask task = gpuTaskService.initGPUTask(deviceId, userInfo.userId(), Instant.now(), device.getHourlyRate(), TaskStatus.CREATING);
                     DContainerInfoResp infoResp = deviceTaskService.importAndUpDockerImage(
-                        inputStream, device.getServerId(), devices);
+                        resource.getInputStream() ,file.getName() ,file.getSize(), device.getServerId(), devices);
                     gpuTaskService.runningGPUTask(task.getId(), TaskStatus.ACTIVE, infoResp.containerId(), infoResp.containerName());
                 } catch (IOException e) {
                     log.warn("{} 镜像运行失败：{}", resource.getFilename(), e.getMessage());
