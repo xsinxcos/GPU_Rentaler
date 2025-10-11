@@ -15,11 +15,12 @@ import jakarta.annotation.Resource;
 import net.devh.boot.grpc.server.service.GrpcService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 
 @GrpcService
 @Service
@@ -66,46 +67,62 @@ public class GrpcDeviceMonitorService extends MonitorServiceGrpc.MonitorServiceI
 
     @Override
     public void updateServerInfo(MonitorServiceProto.ServerInfo request, StreamObserver<Empty> responseObserver) {
-        asyncService.asyncExecute(() -> {
-            serverService.updateServerInfo(
-                request.getServerId(),
-                request.getHostname(),
-                request.getIpAddress(),
-                request.getCpuModel(),
-                request.getCpuCores(),
-                request.getRamTotalGb(),
-                request.getStorageTotalGb(),
-                request.getGpuSlots()
-            );
-            List<MonitorServiceProto.GPUDeviceInfo> gpuDeviceInfosList = request.getGpuDeviceInfosList();
-            List<BasicGPUDeviceDTO> dtos = new ArrayList<>();
-            for (MonitorServiceProto.GPUDeviceInfo info : gpuDeviceInfosList) {
-                dtos.add(new BasicGPUDeviceDTO(info.getDeviceIndex(), info.getDeviceId(), info.getBrand(), info.getModel(), info.getMemoryTotal()));
-            }
-            gpuDeviceService.saveOrUpdateGPUDeviceInfo(request.getServerId(), dtos);
-        });
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
+
+        serverService.updateServerInfo(
+            request.getServerId(),
+            request.getHostname(),
+            request.getIpAddress(),
+            request.getCpuModel(),
+            request.getCpuCores(),
+            request.getRamTotalGb(),
+            request.getStorageTotalGb(),
+            request.getGpuSlots()
+        );
+        List<MonitorServiceProto.GPUDeviceInfo> gpuDeviceInfosList = request.getGpuDeviceInfosList();
+        List<BasicGPUDeviceDTO> dtos = new ArrayList<>();
+        for (MonitorServiceProto.GPUDeviceInfo info : gpuDeviceInfosList) {
+            dtos.add(new BasicGPUDeviceDTO(info.getDeviceIndex(), info.getDeviceId(), info.getBrand(), info.getModel(), info.getMemoryTotal()));
+        }
+        gpuDeviceService.saveOrUpdateGPUDeviceInfo(request.getServerId(), dtos);
     }
 
     @Override
     public void reportProcessMsg(MonitorServiceProto.ReportProcessMsgRequest request, StreamObserver<Empty> responseObserver) {
-        asyncService.asyncExecute(() -> {
-            long serverId = request.getServerId();
-            serverHeartBeatRecord.recordHeartBeat(serverId);
-
-            List<MonitorServiceProto.ProcessInfo> processInfos = request.getProcessInfosList();
-            String recordId = UUID.randomUUID().toString();
-            processInfos.forEach(item ->
-                {
-                    Timestamp time = item.getTime();
-                    Instant instant = Instant.ofEpochSecond(time.getSeconds(), time.getNanos());
-                    gpuProcessActivityService.saveActivity(item.getPid(), item.getName(),
-                        item.getDeviceId(), instant, item.getDurationSeconds() ,recordId);
-                }
-            );
-        });
         responseObserver.onNext(Empty.getDefaultInstance());
         responseObserver.onCompleted();
+
+        long serverId = request.getServerId();
+        serverHeartBeatRecord.recordHeartBeat(serverId);
+
+        List<MonitorServiceProto.ProcessInfo> processInfos = request.getProcessInfosList();
+        String recordId = UUID.randomUUID().toString();
+        processInfos.forEach(item ->
+            {
+                Timestamp time = item.getTime();
+                Instant instant = Instant.ofEpochSecond(time.getSeconds(), time.getNanos());
+                gpuProcessActivityService.saveActivity(item.getPid(), item.getName(),
+                    item.getDeviceId(), instant, item.getDurationSeconds(), recordId);
+            }
+        );
+
+    }
+
+    @Override
+    public void reportGPUUsage(MonitorServiceProto.ReportGPUUsageRequest request, StreamObserver<Empty> responseObserver) {
+        responseObserver.onNext(Empty.getDefaultInstance());
+        responseObserver.onCompleted();
+
+        List<MonitorServiceProto.GPUUsageInfo> gpuUsagesList = request.getGpuUsagesList();
+
+        List<String> notRDeviceIds = gpuUsagesList.stream().filter(item -> item.getGpuUtilizationPercent() >= 80 || item.getMemoryUsedPercent() >= 80)
+            .map(MonitorServiceProto.GPUUsageInfo::getDeviceId).toList();
+
+        List<String> canRDeviceIds = gpuUsagesList.stream().filter(item -> item.getGpuUtilizationPercent() < 80 && item.getMemoryUsedPercent() < 80)
+            .map(MonitorServiceProto.GPUUsageInfo::getDeviceId).toList();
+
+        gpuDeviceService.notRentable(notRDeviceIds);
+        gpuDeviceService.canRentable(canRDeviceIds);
     }
 }

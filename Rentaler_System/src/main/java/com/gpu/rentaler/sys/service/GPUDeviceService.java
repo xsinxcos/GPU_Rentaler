@@ -86,15 +86,8 @@ public class GPUDeviceService {
 
 
     public Optional<GPUDevice> lease(String deviceId) {
-        synchronized (this) {
-            GPUDevice device = getByDeviceId(deviceId);
-            if (device.getIsRentable()) {
-                device.setIsRentable(false);
-                gpuDeviceRepository.save(device);
-                return Optional.of(device);
-            }
-        }
-        return Optional.empty();
+        GPUDevice device = getByDeviceId(deviceId);
+        return Optional.of(device);
     }
 
     public List<GPUDevice> getById(List<Long> ids) {
@@ -161,5 +154,14 @@ public class GPUDeviceService {
 
     public List<GPUDevice> getByDeviceIds(List<String> deviceIds) {
         return gpuDeviceRepository.findByDeviceIdIn(deviceIds);
+    }
+
+    public void notRentable(List<String> deviceIds){
+        gpuDeviceRepository.updateIsRentableByDeviceIdIn(false ,deviceIds);
+    }
+
+    public void canRentable(List<String> canRDeviceIds) {
+        gpuDeviceRepository.updateIsRentableByDeviceIdIn(true ,canRDeviceIds);
+
     }
 }

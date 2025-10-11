@@ -4,7 +4,7 @@ package com.gpu.rentaler.controller;
 import com.gpu.rentaler.common.Constants;
 import com.gpu.rentaler.common.SessionItemHolder;
 import com.gpu.rentaler.common.authz.RequiresPermissions;
-import com.gpu.rentaler.entity.DContainerInfoResp;
+import com.gpu.rentaler.sys.monitor.DContainerInfoResp;
 import com.gpu.rentaler.infra.service.AsyncService;
 import com.gpu.rentaler.sys.constant.TaskStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;

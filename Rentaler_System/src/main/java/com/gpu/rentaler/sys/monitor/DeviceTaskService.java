@@ -1,6 +1,5 @@
 package com.gpu.rentaler.sys.monitor;
 
-import com.gpu.rentaler.entity.DContainerInfoResp;
 import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.model.Server;
 import com.gpu.rentaler.sys.service.GPUDeviceService;

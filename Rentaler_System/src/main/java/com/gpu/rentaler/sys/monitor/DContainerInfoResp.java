@@ -1,4 +1,4 @@
-package com.gpu.rentaler.entity;
+package com.gpu.rentaler.sys.monitor;
 
 import java.io.Serializable;
 

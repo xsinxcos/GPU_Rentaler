@@ -1,6 +1,7 @@
 package com.gpu.rentaler.service;
 
 import com.google.protobuf.Timestamp;
+import com.gpu.rentaler.entity.GPUUsage;
 import com.gpu.rentaler.entity.ProcessInfo;
 import com.gpu.rentaler.grpc.MonitorServiceGrpc;
 import com.gpu.rentaler.grpc.MonitorServiceProto;
@@ -40,7 +41,7 @@ public class GrpcProcessTaskService {
      * fixedRate: 以固定速率执行，即从上一次任务开始时间算起，间隔指定时间后再次执行
      */
     @Scheduled(fixedRate = 10000) // 10秒
-    public void executeTask() {
+    public void reportProcessMsg() {
         try {
             List<ProcessInfo> allGPUActivityInfo = gpuFactory.getAllDockerContainerGPUActivityInfo();
 
@@ -70,7 +71,45 @@ public class GrpcProcessTaskService {
                 .build();
             monitorServiceBlockingStub.reportProcessMsg(request);
         } catch (Exception e) {
-            log.info("{} - Error in executeTask: {}", LocalDateTime.now().format(formatter), e.getMessage());
+            log.info("{} - Error in reportProcessMsg: {}", LocalDateTime.now().format(formatter), e.getMessage());
+        }
+    }
+
+
+    /**
+     * 每10秒执行一次的定时任务
+     * fixedRate: 以固定速率执行，即从上一次任务开始时间算起，间隔指定时间后再次执行
+     */
+    @Scheduled(fixedRate = 10000) // 10秒
+    public void reportGPUUsage() {
+        try {
+            // 获取 GPU 使用情况
+            List<GPUUsage> gpuUsages = gpuFactory.getAllGPUUsage();
+
+            // 构建 gRPC 请求
+            MonitorServiceProto.ReportGPUUsageRequest.Builder requestBuilder =
+                MonitorServiceProto.ReportGPUUsageRequest.newBuilder()
+                    .setServerId(serverIDManager.getServerId());
+
+            for (GPUUsage usage : gpuUsages) {
+                MonitorServiceProto.GPUUsageInfo info = MonitorServiceProto.GPUUsageInfo.newBuilder()
+                    .setDeviceId(usage.deviceId())
+                    .setGpuUtilizationPercent(usage.gpuUtilizationPercent())
+                    .setMemoryUsedPercent(usage.memoryUsedPercent())
+                    .setTime(com.google.protobuf.Timestamp.newBuilder()
+                        .setSeconds(System.currentTimeMillis() / 1000)
+                        .build())
+                    .build();
+                requestBuilder.addGpuUsages(info);
+            }
+
+            MonitorServiceProto.ReportGPUUsageRequest request = requestBuilder.build();
+
+            // 调用 gRPC 上报
+            monitorServiceBlockingStub.reportGPUUsage(request);
+
+        } catch (Exception e) {
+            log.error("{} - Error in reportGPUUsage: {}", LocalDateTime.now().format(formatter), e.getMessage(), e);
         }
     }
 

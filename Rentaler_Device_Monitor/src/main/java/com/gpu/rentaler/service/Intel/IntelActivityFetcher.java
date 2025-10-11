@@ -1,5 +1,6 @@
 package com.gpu.rentaler.service.Intel;
 
+import com.gpu.rentaler.entity.GPUUsage;
 import com.gpu.rentaler.entity.ProcessInfo;
 import com.gpu.rentaler.service.GPUActivityFetcher;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,11 @@ public class IntelActivityFetcher implements GPUActivityFetcher {
 
     @Override
     public List<ProcessInfo> getGpuProcessInDockerContainer(String containerId) {
+        return List.of();
+    }
+
+    @Override
+    public List<GPUUsage> getGPUUSage() {
         return List.of();
     }
 }

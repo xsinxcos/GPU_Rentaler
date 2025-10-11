@@ -1,7 +1,6 @@
 package com.gpu.rentaler.sys.monitor;
 
 import com.google.protobuf.ByteString;
-import com.gpu.rentaler.entity.DContainerInfoResp;
 import com.gpu.rentaler.grpc.TaskAssignServiceGrpc;
 import com.gpu.rentaler.grpc.TaskAssignServiceProto;
 import com.gpu.rentaler.grpc.TaskAssignServiceProto.StopDockerContainerRequest;

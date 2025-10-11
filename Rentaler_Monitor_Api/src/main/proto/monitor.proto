@@ -40,18 +40,6 @@ message ServerInfo {
     repeated GPUDeviceInfo gpuDeviceInfos = 9;
 }
 
-// 服务定义
-service MonitorService {
-    // 上报服务器信息，返回服务器ID
-    rpc reportServerInfo(ServerInfo) returns (Int64Value);
-
-    // 更新服务器信息，无返回值
-    rpc updateServerInfo(ServerInfo) returns (google.protobuf.Empty);
-
-    // 上报进程信息，无返回值
-    rpc reportProcessMsg(ReportProcessMsgRequest) returns (google.protobuf.Empty);
-}
-
 // 包装返回 int64
 message Int64Value {
     int64 value = 1;
@@ -62,3 +50,35 @@ message ReportProcessMsgRequest {
     int64 serverId = 1;
     repeated ProcessInfo processInfos = 2;
 }
+
+
+// GPU 使用情况上报
+message GPUUsageInfo {
+    string deviceId = 1;          // GPU 唯一标识
+    double memoryUsedPercent = 2; // 显存占用百分比，例如 75.5
+    double gpuUtilizationPercent = 3; // GPU 利用率百分比，例如 60.0
+    google.protobuf.Timestamp time = 4; // 上报时间
+}
+
+// 上报多个 GPU 使用情况请求
+message ReportGPUUsageRequest {
+    int64 serverId = 1;                 // 所属服务器 ID
+    repeated GPUUsageInfo gpuUsages = 2;
+}
+
+
+// 服务定义
+service MonitorService {
+    // 上报服务器信息，返回服务器ID
+    rpc reportServerInfo(ServerInfo) returns (Int64Value);
+
+    // 更新服务器信息，无返回值
+    rpc updateServerInfo(ServerInfo) returns (google.protobuf.Empty);
+
+    // 上报进程信息，无返回值
+    rpc reportProcessMsg(ReportProcessMsgRequest) returns (google.protobuf.Empty);
+
+    // 上报 GPU 显存占用率和利用率
+    rpc reportGPUUsage(ReportGPUUsageRequest) returns (google.protobuf.Empty);
+}
+

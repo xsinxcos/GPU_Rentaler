@@ -37,4 +37,9 @@ public interface GPUDeviceRepository extends JpaRepository<GPUDevice, Long> {
 
     @Query("select g from GPUDevice g where g.deviceId in ?1")
     List<GPUDevice> findByDeviceIdIn(Collection<String> deviceIds);
+
+    @Transactional
+    @Modifying
+    @Query("update GPUDevice g set g.isRentable = ?1 where g.deviceId in ?2")
+    void updateIsRentableByDeviceIdIn(Boolean isRentable, Collection<String> deviceIds);
 }
