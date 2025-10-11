@@ -103,7 +103,7 @@ public class GrpcDeviceMonitorService extends MonitorServiceGrpc.MonitorServiceI
                 Timestamp time = item.getTime();
                 Instant instant = Instant.ofEpochSecond(time.getSeconds(), time.getNanos());
                 gpuProcessActivityService.saveActivity(item.getPid(), item.getName(),
-                    item.getDeviceId(), instant, item.getDurationSeconds(), recordId);
+                    item.getDeviceId(), instant, item.getDurationSeconds(), recordId ,item.getContainerId());
             }
         );
 

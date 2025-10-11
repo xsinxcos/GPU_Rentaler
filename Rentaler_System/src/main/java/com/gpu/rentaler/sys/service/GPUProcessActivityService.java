@@ -16,12 +16,12 @@ public class GPUProcessActivityService {
         this.gpuProcessActivityRepository = gpuProcessActivityRepository;
     }
 
-    public void saveActivity(String pid , String processName, String deviceId, Instant time ,Long duration ,String recordId) {
-        GPUProcessActivity activity = new GPUProcessActivity(deviceId, Long.valueOf(pid), processName, time ,duration ,recordId);
+    public void saveActivity(String pid , String processName, String deviceId, Instant time ,Long duration ,String recordId ,String containerId) {
+        GPUProcessActivity activity = new GPUProcessActivity(deviceId, Long.valueOf(pid), processName, time ,duration ,recordId ,containerId);
         gpuProcessActivityRepository.save(activity);
     }
 
-    public List<GPUProcessActivity> getAllAfterTime(String deviceId ,Instant time){
-        return gpuProcessActivityRepository.findByDeviceIdAndTimeAfter(deviceId ,time);
+    public List<GPUProcessActivity> getAllAfterTime(String deviceId ,String containerId ,Instant time){
+        return gpuProcessActivityRepository.findByDeviceIdAndContainerIdAndTimeAfter(deviceId ,containerId ,time);
     }
 }

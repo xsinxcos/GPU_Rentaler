@@ -18,7 +18,7 @@ services:
             SPRING_DATASOURCE_PASSWORD: 123456
 
             # JVM 参数
-            JAVA_OPTS: -Xms512m -Xmx1024m -Dfile.encoding=UTF-8
+            JAVA_OPTS: -Xms512m -Xmx2g -Dfile.encoding=UTF-8
 
         volumes:
             - "D:/docker-volumes/gpu/files:/app/files"     # 应用数据目录（如缓存、导出）

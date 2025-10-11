@@ -47,7 +47,7 @@ public class BillingSettleService {
             if (taskBilled.isPresent()) {
                 time = taskBilled.get().getEndBillTime();
             }
-            List<GPUProcessActivity> allAfterTime = activityService.getAllAfterTime(task.getDeviceId(), time);
+            List<GPUProcessActivity> allAfterTime = activityService.getAllAfterTime(task.getDeviceId() ,task.getContainerId().substring(0 ,12), time);
             if (allAfterTime.isEmpty()) continue;
             List<GPUProcessActivity> activities = keepUniqueByRecordId(allAfterTime);
             long costTimeSecond = costTimeSecond(activities);

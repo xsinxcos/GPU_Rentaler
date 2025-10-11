@@ -61,7 +61,7 @@ public class AMDActivityFetcher implements GPUActivityFetcher {
         try {
             executor.execute(cmdLine);
         } catch (IOException e) {
-            log.warn("获取AMD GPU使用信息失败: {}", e.getMessage());
+            //log.warn("获取AMD GPU使用信息失败: {}", e.getMessage());
             return List.of();
         }
 

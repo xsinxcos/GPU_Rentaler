@@ -25,13 +25,24 @@ public class GPUProcessActivity extends BaseEntity{
 
     private String recordId;
 
-    public GPUProcessActivity(String deviceId, Long pid, String processName, Instant time, Long duration, String recordId) {
+    private String containerId;
+
+    public GPUProcessActivity(String deviceId, Long pid, String processName, Instant time, Long duration, String recordId, String containerId) {
         this.deviceId = deviceId;
         this.pid = pid;
         this.processName = processName;
         this.time = time;
         this.duration = duration;
         this.recordId = recordId;
+        this.containerId = containerId;
+    }
+
+    public String getContainerId() {
+        return containerId;
+    }
+
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
     }
 
     public String getRecordId() {
