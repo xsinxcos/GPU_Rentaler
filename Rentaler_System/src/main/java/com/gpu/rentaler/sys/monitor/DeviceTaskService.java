@@ -1,8 +1,8 @@
 package com.gpu.rentaler.sys.monitor;
 
-import com.gpu.rentaler.sys.model.GPUDevice;
+import com.gpu.rentaler.sys.model.GPURealDevices;
 import com.gpu.rentaler.sys.model.Server;
-import com.gpu.rentaler.sys.service.GPUDeviceService;
+import com.gpu.rentaler.sys.service.GPURealDevicesService;
 import com.gpu.rentaler.sys.service.ServerService;
 import jakarta.annotation.Resource;
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,13 +26,13 @@ public class DeviceTaskService {
     private ServerService serverService;
 
     @Resource
-    private GPUDeviceService gpuDeviceService;
+    private GPURealDevicesService gpuRealDevicesService;
 
 
     public DContainerInfoResp importAndUpDockerImage(InputStream stream ,String filename ,long contentLength, Long serverId, List<String> deviceIds) throws IOException {
         try {
-            List<GPUDevice> devices = gpuDeviceService.getByDeviceIds(deviceIds);
-            List<Integer> deviceIndex = devices.stream().map(GPUDevice::getDeviceIndex).collect(Collectors.toList());
+            List<GPURealDevices> devices = gpuRealDevicesService.getByDeviceIds(deviceIds);
+            List<Integer> deviceIndex = devices.stream().map(GPURealDevices::getDeviceIndex).collect(Collectors.toList());
 
             GrpcTaskAssignClient client = getGrpcTaskAssignClient(serverId);
             DContainerInfoResp resp = client.upDockerImageStream(stream,filename ,contentLength , deviceIndex);

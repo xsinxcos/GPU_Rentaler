@@ -4,14 +4,15 @@ package com.gpu.rentaler.controller;
 import com.gpu.rentaler.common.Constants;
 import com.gpu.rentaler.common.SessionItemHolder;
 import com.gpu.rentaler.common.authz.RequiresPermissions;
-import com.gpu.rentaler.sys.model.StorageFile;
-import com.gpu.rentaler.sys.monitor.DContainerInfoResp;
 import com.gpu.rentaler.infra.service.AsyncService;
 import com.gpu.rentaler.sys.constant.TaskStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.model.GPUTask;
+import com.gpu.rentaler.sys.model.StorageFile;
+import com.gpu.rentaler.sys.monitor.DContainerInfoResp;
 import com.gpu.rentaler.sys.monitor.DeviceTaskService;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
+import com.gpu.rentaler.sys.service.GPURealDevicesService;
 import com.gpu.rentaler.sys.service.GPUTaskService;
 import com.gpu.rentaler.sys.service.StorageService;
 import com.gpu.rentaler.sys.service.dto.GPUDeviceDTO;
@@ -28,7 +29,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +53,9 @@ public class GPUDeviceController {
 
     @Resource
     private AsyncService asyncService;
+
+    @Resource
+    private GPURealDevicesService gpuRealDevicesService;
 
     @RequiresPermissions("gpu:release")
     @DeleteMapping("/{deviceId}/release")

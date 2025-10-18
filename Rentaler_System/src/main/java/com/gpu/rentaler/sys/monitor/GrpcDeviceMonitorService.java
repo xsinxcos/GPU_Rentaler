@@ -4,10 +4,11 @@ import com.google.protobuf.Empty;
 import com.google.protobuf.Timestamp;
 import com.gpu.rentaler.grpc.MonitorServiceGrpc;
 import com.gpu.rentaler.grpc.MonitorServiceProto;
-import com.gpu.rentaler.infra.service.AsyncService;
+import com.gpu.rentaler.sys.model.GPURealDevices;
 import com.gpu.rentaler.sys.model.Server;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
 import com.gpu.rentaler.sys.service.GPUProcessActivityService;
+import com.gpu.rentaler.sys.service.GPURealDevicesService;
 import com.gpu.rentaler.sys.service.ServerService;
 import com.gpu.rentaler.sys.service.dto.BasicGPUDeviceDTO;
 import io.grpc.stub.StreamObserver;
@@ -40,7 +41,7 @@ public class GrpcDeviceMonitorService extends MonitorServiceGrpc.MonitorServiceI
     private GPUProcessActivityService gpuProcessActivityService;
 
     @Resource
-    private AsyncService asyncService;
+    private GPURealDevicesService gpuRealDevicesService;
 
     @Override
     public void reportServerInfo(MonitorServiceProto.ServerInfo request, StreamObserver<MonitorServiceProto.Int64Value> responseObserver) {
@@ -58,8 +59,9 @@ public class GrpcDeviceMonitorService extends MonitorServiceGrpc.MonitorServiceI
         for (MonitorServiceProto.GPUDeviceInfo info : gpuDeviceInfosList) {
             dtos.add(new BasicGPUDeviceDTO(info.getDeviceIndex(), info.getDeviceId(), info.getBrand(), info.getModel(), info.getMemoryTotal()));
         }
-        gpuDeviceService.saveOrUpdateGPUDeviceInfo(server.getId(), dtos);
+        List<GPURealDevices> gpuRealDevices = gpuRealDevicesService.saveOrUpdateGPUDeviceInfo(server.getId(), dtos);
 
+        gpuDeviceService.saveOrUpdateGPUDeviceType(gpuRealDevices);
         MonitorServiceProto.Int64Value resp = MonitorServiceProto.Int64Value.newBuilder().setValue(server.getId()).build();
         responseObserver.onNext(resp);
         responseObserver.onCompleted();
@@ -85,7 +87,9 @@ public class GrpcDeviceMonitorService extends MonitorServiceGrpc.MonitorServiceI
         for (MonitorServiceProto.GPUDeviceInfo info : gpuDeviceInfosList) {
             dtos.add(new BasicGPUDeviceDTO(info.getDeviceIndex(), info.getDeviceId(), info.getBrand(), info.getModel(), info.getMemoryTotal()));
         }
-        gpuDeviceService.saveOrUpdateGPUDeviceInfo(request.getServerId(), dtos);
+        List<GPURealDevices> gpuRealDevices = gpuRealDevicesService.saveOrUpdateGPUDeviceInfo(request.getServerId(), dtos);
+
+        gpuDeviceService.saveOrUpdateGPUDeviceType(gpuRealDevices);
     }
 
     @Override
@@ -106,7 +110,6 @@ public class GrpcDeviceMonitorService extends MonitorServiceGrpc.MonitorServiceI
                     item.getDeviceId(), instant, item.getDurationSeconds(), recordId ,item.getContainerId());
             }
         );
-
     }
 
     @Override
@@ -122,7 +125,7 @@ public class GrpcDeviceMonitorService extends MonitorServiceGrpc.MonitorServiceI
         List<String> canRDeviceIds = gpuUsagesList.stream().filter(item -> item.getGpuUtilizationPercent() < 80 && item.getMemoryUsedPercent() < 80)
             .map(MonitorServiceProto.GPUUsageInfo::getDeviceId).toList();
 
-        gpuDeviceService.notRentable(notRDeviceIds);
-        gpuDeviceService.canRentable(canRDeviceIds);
+        gpuRealDevicesService.notRentable(notRDeviceIds);
+        gpuRealDevicesService.canRentable(canRDeviceIds);
     }
 }

@@ -8,7 +8,6 @@ import com.gpu.rentaler.sys.service.*;
 import jakarta.annotation.Resource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -47,7 +46,7 @@ public class BillingSettleService {
             if (taskBilled.isPresent()) {
                 time = taskBilled.get().getEndBillTime();
             }
-            List<GPUProcessActivity> allAfterTime = activityService.getAllAfterTime(task.getDeviceId() ,task.getContainerId().substring(0 ,12), time);
+            List<GPUProcessActivity> allAfterTime = activityService.getAllAfterTime(task.getDeviceId(), task.getContainerId().substring(0, 12), time);
             if (allAfterTime.isEmpty()) continue;
             List<GPUProcessActivity> activities = keepUniqueByRecordId(allAfterTime);
             long costTimeSecond = costTimeSecond(activities);
@@ -63,8 +62,6 @@ public class BillingSettleService {
             if (nowBalance.compareTo(new BigDecimal(20)) < 0) {
                 gpuTaskService.forceCancelTask(task.getId());
                 GPUDevice device = gpuDeviceService.getByDeviceId(task.getDeviceId());
-                // 释放设备
-                gpuDeviceService.returnDevice(task.getDeviceId());
                 // 停止容器
                 deviceTaskService.stopContainer(device.getServerId(), task.getContainerId());
             }

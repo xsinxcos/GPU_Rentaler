@@ -16,7 +16,6 @@ import com.gpu.rentaler.sys.service.dto.PageDTO;
 import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.annotation.Resource;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -97,7 +96,6 @@ public class TaskController {
                 gpuTaskService.finishTask(taskId, sumCost);
                 GPUDevice device = gpuDeviceService.getByDeviceId(task.getDeviceId());
                 // 释放设备
-                gpuDeviceService.returnDevice(task.getDeviceId());
                 deviceTaskService.stopContainer(device.getServerId(), task.getContainerId());
                 deviceTaskService.deleteContainer(device.getServerId(), task.getContainerId());
             }

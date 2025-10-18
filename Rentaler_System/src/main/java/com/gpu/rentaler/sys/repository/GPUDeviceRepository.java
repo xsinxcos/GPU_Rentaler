@@ -42,4 +42,10 @@ public interface GPUDeviceRepository extends JpaRepository<GPUDevice, Long> {
     @Modifying
     @Query("update GPUDevice g set g.isRentable = ?1 where g.deviceId in ?2")
     void updateIsRentableByDeviceIdIn(Boolean isRentable, Collection<String> deviceIds);
+
+    @Query("select (count(g) > 0) from GPUDevice g where g.deviceId = ?1 or g.brand = ?2")
+    boolean existsByDeviceIdOrBrand(String deviceId, String brand);
+
+    @Query("select (count(g) > 0) from GPUDevice g where g.deviceId = ?1 or g.model = ?2")
+    boolean existsByDeviceIdOrModel(String deviceId, String model);
 }

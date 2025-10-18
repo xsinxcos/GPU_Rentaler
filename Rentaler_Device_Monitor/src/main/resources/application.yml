@@ -20,7 +20,7 @@ grpc:
         maxInboundMessageSize: 1GB
     client:
         backend:
-            address: "localhost:50052"
+            address: "localhost:50051"
             negotiationType: plaintext  # 明文通信，不使用 TLS
             maxInboundMessageSize: 50MB
 

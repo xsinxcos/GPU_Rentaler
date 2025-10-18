@@ -3,9 +3,8 @@ package com.gpu.rentaler.sys.service;
 import com.gpu.rentaler.common.StringUtils;
 import com.gpu.rentaler.sys.constant.DeviceStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
+import com.gpu.rentaler.sys.model.GPURealDevices;
 import com.gpu.rentaler.sys.repository.GPUDeviceRepository;
-import com.gpu.rentaler.sys.repository.GPUTaskRepository;
-import com.gpu.rentaler.sys.service.dto.BasicGPUDeviceDTO;
 import com.gpu.rentaler.sys.service.dto.GPUDeviceDTO;
 import com.gpu.rentaler.sys.service.dto.PageDTO;
 import com.gpu.rentaler.sys.service.dto.RentableGPUDeviceDTO;
@@ -17,57 +16,31 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class GPUDeviceService {
     private final GPUDeviceRepository gpuDeviceRepository;
 
-    public GPUDeviceService(GPUDeviceRepository gpuDeviceRepository, GPUTaskRepository gpuTaskRepository) {
+    public GPUDeviceService(GPUDeviceRepository gpuDeviceRepository) {
         this.gpuDeviceRepository = gpuDeviceRepository;
     }
 
     @Transactional
-    public void saveOrUpdateGPUDeviceInfo(Long serverId, List<BasicGPUDeviceDTO> gpuDeviceInfos) {
-        List<GPUDevice> existingDevices = gpuDeviceRepository.findAllByServerId(serverId);
-        Map<String, GPUDevice> existingDeviceMap = existingDevices.stream()
-            .collect(Collectors.toMap(GPUDevice::getDeviceId, device -> device));
-        List<BasicGPUDeviceDTO> updateDevices = new ArrayList<>();
-        List<BasicGPUDeviceDTO> saveDevices = new ArrayList<>();
-        for (BasicGPUDeviceDTO gpuDeviceInfo : gpuDeviceInfos) {
-            if (existingDeviceMap.containsKey(gpuDeviceInfo.deviceId())) {
-                updateDevices.add(gpuDeviceInfo);
-            } else {
-                saveDevices.add(gpuDeviceInfo);
+    public void saveOrUpdateGPUDeviceType(List<GPURealDevices> gPURealDevices) {
+        List<GPURealDevices> saveDevices = new ArrayList<>();
+        for (GPURealDevices realDevice : gPURealDevices) {
+            if (!gpuDeviceRepository.existsByDeviceIdOrModel(realDevice.getModel(), realDevice.getModel())) {
+                saveDevices.add(realDevice);
             }
         }
 
-        for (BasicGPUDeviceDTO updateDevice : updateDevices) {
-            GPUDevice existingDevice = existingDeviceMap.get(updateDevice.deviceId());
-            existingDevice.setServerId(serverId);
-            existingDevice.setDeviceId(updateDevice.deviceId());
-            existingDevice.setMemoryTotal(updateDevice.memoryTotal());
-            existingDevice.setDeviceIndex(updateDevice.deviceIndex());
-            existingDevice.setBrand(updateDevice.brand());
-            existingDevice.setMemoryTotal(updateDevice.memoryTotal());
-            existingDevice.setModel(updateDevice.model());
-            existingDevice.setStatus(DeviceStatus.ONLINE);
-            gpuDeviceRepository.save(existingDevice);
-        }
-
-        for (BasicGPUDeviceDTO saveDevice : saveDevices) {
+        for (GPURealDevices saveDevice : saveDevices) {
             GPUDevice newDevice = new GPUDevice();
-            newDevice.setServerId(serverId);
-            newDevice.setDeviceId(saveDevice.deviceId());
-            newDevice.setMemoryTotal(saveDevice.memoryTotal());
-            newDevice.setDeviceIndex(saveDevice.deviceIndex());
-            newDevice.setBrand(saveDevice.brand());
-            newDevice.setMemoryTotal(saveDevice.memoryTotal());
-            newDevice.setModel(saveDevice.model());
-            newDevice.setStatus(DeviceStatus.ONLINE);
-            newDevice.setStatus(DeviceStatus.ONLINE);
+            newDevice.setDeviceId(saveDevice.getModel());
+            newDevice.setMemoryTotal(saveDevice.getMemoryTotal());
+            newDevice.setBrand(saveDevice.getBrand());
+            newDevice.setModel(saveDevice.getModel());
             gpuDeviceRepository.save(newDevice);
         }
     }
@@ -148,20 +121,11 @@ public class GPUDeviceService {
         }
     }
 
-    public synchronized void returnDevice(String deviceId) {
-        gpuDeviceRepository.updateIsRentableByDeviceId(true, deviceId);
+    public void updateCanRentable(List<String> deviceIds) {
+        gpuDeviceRepository.updateIsRentableByDeviceIdIn(true, deviceIds);
     }
 
-    public List<GPUDevice> getByDeviceIds(List<String> deviceIds) {
-        return gpuDeviceRepository.findByDeviceIdIn(deviceIds);
-    }
-
-    public void notRentable(List<String> deviceIds){
-        gpuDeviceRepository.updateIsRentableByDeviceIdIn(false ,deviceIds);
-    }
-
-    public void canRentable(List<String> canRDeviceIds) {
-        gpuDeviceRepository.updateIsRentableByDeviceIdIn(true ,canRDeviceIds);
-
+    public void updateNotRentable(List<String> deviceIds) {
+        gpuDeviceRepository.updateIsRentableByDeviceIdIn(false, deviceIds);
     }
 }
