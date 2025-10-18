@@ -1,5 +1,6 @@
 package com.gpu.rentaler.sys.repository;
 
+import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.model.GPURealDevices;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,4 +33,10 @@ public interface GPURealDevicesRepository extends JpaRepository<GPURealDevices, 
 
     @Query("select g from GPURealDevices g where g.status = ?1 or g.isRentable = ?2")
     List<GPURealDevices> findByStatusOrIsRentable(String status, Boolean isRentable);
+
+    @Query("select g from GPURealDevices g where g.model = ?1 and g.status = ?2 and g.isRentable = ?3")
+    List<GPURealDevices> findByModelAndStatusAndIsRentable(String model, String status, Boolean isRentable);
+
+    @Query("select g from GPURealDevices g where g.realDeviceId = ?1")
+    GPURealDevices findByRealDeviceId(String realDeviceId);
 }

@@ -4,12 +4,13 @@ package com.gpu.rentaler.controller;
 import com.gpu.rentaler.common.Constants;
 import com.gpu.rentaler.common.SessionItemHolder;
 import com.gpu.rentaler.common.authz.RequiresPermissions;
+import com.gpu.rentaler.sys.model.GPURealDevices;
+import com.gpu.rentaler.sys.model.StorageFile;
+import com.gpu.rentaler.sys.monitor.DContainerInfoResp;
 import com.gpu.rentaler.infra.service.AsyncService;
 import com.gpu.rentaler.sys.constant.TaskStatus;
 import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.model.GPUTask;
-import com.gpu.rentaler.sys.model.StorageFile;
-import com.gpu.rentaler.sys.monitor.DContainerInfoResp;
 import com.gpu.rentaler.sys.monitor.DeviceTaskService;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
 import com.gpu.rentaler.sys.service.GPURealDevicesService;
@@ -29,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,7 +101,9 @@ public class GPUDeviceController {
             return ResponseEntity.ok(new LeaseGPUDeviceDTO(false, "租用失败，资源不符合要求"));
         }
         // 租用GPU设备的逻辑
-        Optional<GPUDevice> lease = gpuDeviceService.lease(deviceId);
+        String model = deviceId;
+        Optional<GPURealDevices> lease = gpuRealDevicesService.lease(model);
+        GPUDevice deviceType = gpuDeviceService.getByDeviceId(deviceId);
         final LeaseGPUDeviceDTO[] dto = new LeaseGPUDeviceDTO[1];
         lease.ifPresentOrElse(device -> {
             UserinfoDTO userInfo = (UserinfoDTO) SessionItemHolder.getItem(Constants.SESSION_CURRENT_USER);
@@ -109,7 +113,7 @@ public class GPUDeviceController {
                 try {
                     List<String> devices = new ArrayList<>();
                     devices.add(deviceId);
-                    GPUTask task = gpuTaskService.initGPUTask(deviceId, userInfo.userId(), Instant.now(), device.getHourlyRate(), TaskStatus.CREATING);
+                    GPUTask task = gpuTaskService.initGPUTask(deviceId, userInfo.userId(), Instant.now(), deviceType.getHourlyRate(), TaskStatus.CREATING);
                     DContainerInfoResp infoResp = deviceTaskService.importAndUpDockerImage(
                         resource.getInputStream() ,file.getName() ,file.getSize(), device.getServerId(), devices);
                     gpuTaskService.runningGPUTask(task.getId(), TaskStatus.ACTIVE, infoResp.containerId(), infoResp.containerName());

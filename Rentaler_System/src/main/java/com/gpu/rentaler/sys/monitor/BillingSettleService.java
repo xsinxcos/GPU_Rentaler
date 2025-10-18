@@ -1,7 +1,7 @@
 package com.gpu.rentaler.sys.monitor;
 
-import com.gpu.rentaler.sys.model.GPUDevice;
 import com.gpu.rentaler.sys.model.GPUProcessActivity;
+import com.gpu.rentaler.sys.model.GPURealDevices;
 import com.gpu.rentaler.sys.model.GPUTask;
 import com.gpu.rentaler.sys.model.TaskBilled;
 import com.gpu.rentaler.sys.service.*;
@@ -32,7 +32,7 @@ public class BillingSettleService {
     private DeviceTaskService deviceTaskService;
 
     @Resource
-    private GPUDeviceService gpuDeviceService;
+    private GPURealDevicesService gpuRealDevicesService;
 
     /**
      * 一分钟 结算一次费用
@@ -61,7 +61,7 @@ public class BillingSettleService {
             // 欠费超过 20 ，强制停止任务
             if (nowBalance.compareTo(new BigDecimal(20)) < 0) {
                 gpuTaskService.forceCancelTask(task.getId());
-                GPUDevice device = gpuDeviceService.getByDeviceId(task.getDeviceId());
+                GPURealDevices device = gpuRealDevicesService.getByDeviceId(task.getDeviceId());
                 // 停止容器
                 deviceTaskService.stopContainer(device.getServerId(), task.getContainerId());
             }
