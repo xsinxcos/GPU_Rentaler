@@ -5,12 +5,10 @@ import com.gpu.rentaler.common.SessionItemHolder;
 import com.gpu.rentaler.common.authz.RequiresPermissions;
 import com.gpu.rentaler.infra.service.AsyncService;
 import com.gpu.rentaler.sys.model.GPUDevice;
+import com.gpu.rentaler.sys.model.GPURealDevices;
 import com.gpu.rentaler.sys.model.GPUTask;
 import com.gpu.rentaler.sys.monitor.DeviceTaskService;
-import com.gpu.rentaler.sys.service.GPUDeviceService;
-import com.gpu.rentaler.sys.service.GPUTaskService;
-import com.gpu.rentaler.sys.service.TaskBilledService;
-import com.gpu.rentaler.sys.service.WalletService;
+import com.gpu.rentaler.sys.service.*;
 import com.gpu.rentaler.sys.service.dto.GPUTaskDTO;
 import com.gpu.rentaler.sys.service.dto.PageDTO;
 import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
@@ -37,8 +35,9 @@ public class TaskController {
     @Resource
     private DeviceTaskService deviceTaskService;
 
+
     @Resource
-    private GPUDeviceService gpuDeviceService;
+    private GPURealDevicesService gpuRealDevicesService;
 
     @Resource
     private WalletService walletService;
@@ -78,7 +77,7 @@ public class TaskController {
         if (gpuTask.isPresent()) {
             GPUTask item = gpuTask.get();
             if (item.getUserId().equals(userInfo.userId())) {
-                GPUDevice device = gpuDeviceService.getByDeviceId(item.getDeviceId());
+                GPURealDevices device = gpuRealDevicesService.getByDeviceId(item.getDeviceId());
                 res = deviceTaskService.getLog(device.getServerId(), item.getContainerId(), logNum);
             }
         }
@@ -95,7 +94,7 @@ public class TaskController {
             if (task.getUserId().equals(userInfo.userId())) {
                 BigDecimal sumCost = taskBilledService.getAllCostByTaskId(taskId);
                 gpuTaskService.finishTask(taskId, sumCost);
-                GPUDevice device = gpuDeviceService.getByDeviceId(task.getDeviceId());
+                GPURealDevices device = gpuRealDevicesService.getByDeviceId(task.getDeviceId());
                 // 释放设备
                 deviceTaskService.stopContainer(device.getServerId(), task.getContainerId());
                 deviceTaskService.deleteContainer(device.getServerId(), task.getContainerId());
@@ -121,7 +120,7 @@ public class TaskController {
         if (gpuTask.isPresent()) {
             GPUTask item = gpuTask.get();
             if (item.getUserId().equals(userInfo.userId())) {
-                GPUDevice device = gpuDeviceService.getByDeviceId(item.getDeviceId());
+                GPURealDevices device = gpuRealDevicesService.getByDeviceId(item.getDeviceId());
                 resp = deviceTaskService.exportContainerData(device.getServerId(), item.getContainerId(), path);
             }
         }
