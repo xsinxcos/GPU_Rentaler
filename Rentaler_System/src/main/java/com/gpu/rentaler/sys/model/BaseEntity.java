@@ -14,7 +14,7 @@ import java.util.Objects;
  * name id. Inspired by the DDD Sample project.
  *
  * @author Christoph Knabe
- * @author cjbi
+ * @author wzq
  * @see <a href=
  * "https://github.com/citerus/dddsample-core/blob/master/src/main/java/se/citerus/dddsample/domain/shared/Entity.java">Entity
  * in the DDD Sample</a>

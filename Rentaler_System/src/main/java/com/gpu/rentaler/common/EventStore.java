@@ -2,7 +2,7 @@ package com.gpu.rentaler.common;
 
 
 /**
- * @author cjbi
+ * @author wzq
  * @date 2022/7/22
  */
 public interface EventStore {

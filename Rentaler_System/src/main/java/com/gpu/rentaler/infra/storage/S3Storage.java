@@ -15,7 +15,7 @@ import java.io.InputStream;
 import java.net.URI;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public class S3Storage implements Storage {
 

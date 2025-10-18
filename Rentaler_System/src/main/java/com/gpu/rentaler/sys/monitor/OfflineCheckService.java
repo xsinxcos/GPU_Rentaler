@@ -4,6 +4,7 @@ import com.gpu.rentaler.sys.constant.DeviceStatus;
 import com.gpu.rentaler.sys.service.GPUDeviceService;
 import com.gpu.rentaler.sys.service.GPURealDevicesService;
 import com.gpu.rentaler.sys.service.ServerService;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,11 @@ public class OfflineCheckService {
     @Resource
     private GPURealDevicesService gpuRealDevicesService;
 
+    @PostConstruct
+    void init(){
+        List<Long> serverIds = serverService.getAllIds();
+        serverHeartBeatRecord.load(serverIds);
+    }
 
     @Scheduled(fixedRate = 5000) // 5秒
     public void executeTask() {
@@ -40,7 +46,6 @@ public class OfflineCheckService {
         List<String> canRentable = gpuRealDevicesService.findCanRentable();
         List<String> cantRentable = gpuRealDevicesService.findCantRentable();
 
-        gpuDeviceService.updateCanRentable(canRentable);
-        gpuDeviceService.updateNotRentable(cantRentable);
+        gpuDeviceService.refresh(canRentable ,cantRentable);
     }
 }

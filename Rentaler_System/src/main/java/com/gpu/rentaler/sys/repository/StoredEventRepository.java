@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Set;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Repository
 public interface StoredEventRepository extends JpaRepository<StoredEvent, Long> {

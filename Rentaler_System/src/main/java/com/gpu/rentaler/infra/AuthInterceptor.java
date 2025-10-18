@@ -16,7 +16,7 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public class AuthInterceptor implements HandlerInterceptor {
 

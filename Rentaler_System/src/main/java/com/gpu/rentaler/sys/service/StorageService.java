@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public interface StorageService {
 

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public class PermissionHelper {
 

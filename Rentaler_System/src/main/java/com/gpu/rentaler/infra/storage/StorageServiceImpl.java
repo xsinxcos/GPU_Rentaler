@@ -29,7 +29,7 @@ import java.util.Random;
 import static com.gpu.rentaler.common.CommonResultStatus.FAIL;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Service
 public class StorageServiceImpl implements StorageService {

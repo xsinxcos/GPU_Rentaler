@@ -4,7 +4,7 @@ package com.gpu.rentaler.infra.storage;
 import java.io.InputStream;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public interface Storage {
 

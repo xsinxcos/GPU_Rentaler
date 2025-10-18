@@ -5,7 +5,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public class SecurityUtil {
 

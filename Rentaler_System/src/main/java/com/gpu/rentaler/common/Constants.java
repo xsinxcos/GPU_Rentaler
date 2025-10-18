@@ -1,7 +1,7 @@
 package com.gpu.rentaler.common;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public class Constants {
 

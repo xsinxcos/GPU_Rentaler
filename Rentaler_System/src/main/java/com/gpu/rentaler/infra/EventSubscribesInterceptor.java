@@ -15,7 +15,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 /**
  * 通用事件处理拦截器，
  *
- * @author cjbi
+ * @author wzq
  */
 public class EventSubscribesInterceptor implements HandlerInterceptor {
     private final EventStore eventStore;

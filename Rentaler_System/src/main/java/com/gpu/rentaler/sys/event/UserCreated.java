@@ -4,7 +4,7 @@ import com.gpu.rentaler.common.DomainEvent;
 import com.gpu.rentaler.sys.model.User;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public record UserCreated(User user) implements DomainEvent {
 }

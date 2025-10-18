@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 /**
  * 会话
  *
- * @author cjbi
+ * @author wzq
  */
 @Entity
 public class Session extends BaseEntity {

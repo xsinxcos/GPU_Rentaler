@@ -198,7 +198,7 @@ public class AMDGPUInfoCollector implements IGPUInfoCollector {
             return outputStream.toString();
 
         } catch (Exception e) {
-            System.err.println("执行命令失败: " + command + " - " + e.getMessage());
+            log.info("执行命令失败: {} - {}", command, e.getMessage());
             return null;
         }
     }

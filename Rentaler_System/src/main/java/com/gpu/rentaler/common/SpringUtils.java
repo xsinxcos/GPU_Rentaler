@@ -7,7 +7,7 @@ import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Component
 public final class SpringUtils implements BeanFactoryPostProcessor {

@@ -42,6 +42,7 @@ public class GrpcProcessTaskService {
      */
     @Scheduled(fixedRate = 10000) // 10秒
     public void reportProcessMsg() {
+        if(serverIDManager.getServerId() == null) return;
         try {
             List<ProcessInfo> allGPUActivityInfo = gpuFactory.getAllDockerContainerGPUActivityInfo();
 
@@ -82,6 +83,7 @@ public class GrpcProcessTaskService {
      */
     @Scheduled(fixedRate = 10000) // 10秒
     public void reportGPUUsage() {
+        if(serverIDManager.getServerId() == null) return;
         try {
             // 获取 GPU 使用情况
             List<GPUUsage> gpuUsages = gpuFactory.getAllGPUUsage();

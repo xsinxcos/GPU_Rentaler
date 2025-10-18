@@ -6,7 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Entity
 public class Organization extends BaseEntity {

@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Configuration
 @OpenAPIDefinition(info = @Info(title = "Admin3", description = "A Flexible and Efficient Backend Framework for Java", version = "v1"))

@@ -22,7 +22,7 @@ import java.util.UUID;
 import static com.gpu.rentaler.sys.model.UserCredential.IdentityType.PASSWORD;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Service
 public class DefaultSessionService implements SessionService {

@@ -8,7 +8,7 @@ import java.util.Set;
 /**
  * 资源
  *
- * @author cjbi
+ * @author wzq
  */
 @Entity
 public class Resource extends BaseEntity {

@@ -4,7 +4,7 @@ import com.gpu.rentaler.common.BusinessException;
 import com.gpu.rentaler.common.ResultStatus;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public class StorageException extends BusinessException {
 

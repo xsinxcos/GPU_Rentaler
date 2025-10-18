@@ -22,7 +22,7 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Component
 public class LocalSessionManager implements SessionManager {

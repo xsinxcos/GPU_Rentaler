@@ -4,7 +4,7 @@ import com.gpu.rentaler.sys.service.dto.UserinfoDTO;
 import org.springframework.stereotype.Service;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Service
 public interface SessionService {

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Repository
 public interface OrganizationRepository extends JpaRepository<Organization, Long> {

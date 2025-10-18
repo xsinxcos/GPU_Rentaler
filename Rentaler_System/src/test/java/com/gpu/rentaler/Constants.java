@@ -1,7 +1,7 @@
 package com.gpu.rentaler;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public class Constants {
     public static final String TOKEN_HEADER_NAME = "Authorization";

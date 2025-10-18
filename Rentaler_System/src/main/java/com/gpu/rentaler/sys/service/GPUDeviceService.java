@@ -16,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class GPUDeviceService {
@@ -48,6 +47,7 @@ public class GPUDeviceService {
     public GPUDevice getByDeviceId(String deviceId) {
         return gpuDeviceRepository.findByDeviceId(deviceId).getFirst();
     }
+
     @Transactional
     public void deleteByDeviceId(String deviceId) {
         gpuDeviceRepository.deleteByDeviceId(deviceId);
@@ -108,5 +108,13 @@ public class GPUDeviceService {
 
     public void updateNotRentable(List<String> deviceIds) {
         gpuDeviceRepository.updateIsRentableByDeviceIdIn(false, deviceIds);
+    }
+
+    public void refresh(List<String> canRentable, List<String> cantRentable) {
+        if(!canRentable.isEmpty()){
+            updateCanRentable(canRentable);
+            cantRentable.removeAll(canRentable);
+        }
+        updateNotRentable(cantRentable);
     }
 }

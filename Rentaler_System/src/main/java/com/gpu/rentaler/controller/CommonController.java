@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 通用功能控制器，声明全局枚举，数据字典等
  *
- * @author cjbi
+ * @author wzq
  */
 @SecurityRequirement(name = "bearerAuth")
 @RestController

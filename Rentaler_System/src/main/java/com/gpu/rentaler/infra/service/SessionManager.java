@@ -5,7 +5,7 @@ import com.gpu.rentaler.sys.model.UserCredential;
 import java.io.Serializable;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public interface SessionManager {
 

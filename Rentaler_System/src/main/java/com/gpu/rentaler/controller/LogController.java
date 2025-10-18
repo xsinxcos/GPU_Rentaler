@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 import static java.util.Optional.ofNullable;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @SecurityRequirement(name = "bearerAuth")
 @RestController

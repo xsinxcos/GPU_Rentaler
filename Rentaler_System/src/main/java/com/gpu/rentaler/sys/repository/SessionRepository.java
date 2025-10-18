@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Repository
 public interface SessionRepository extends JpaRepository<Session, Long> {

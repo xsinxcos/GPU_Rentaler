@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @SecurityRequirement(name = "bearerAuth")
 @RestControllerAdvice

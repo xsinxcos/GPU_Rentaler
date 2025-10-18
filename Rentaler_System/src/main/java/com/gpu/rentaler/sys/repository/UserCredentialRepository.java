@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Repository
 public interface UserCredentialRepository extends JpaRepository<UserCredential, Long> {

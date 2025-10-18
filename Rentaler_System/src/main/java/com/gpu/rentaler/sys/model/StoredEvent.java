@@ -9,7 +9,7 @@ import jakarta.persistence.ManyToOne;
 import java.time.LocalDateTime;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Entity
 public class StoredEvent extends BaseEntity {

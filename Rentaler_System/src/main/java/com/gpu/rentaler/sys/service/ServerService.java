@@ -105,4 +105,8 @@ public class ServerService {
     public void deleteById(Long serverId) {
         serverRepository.deleteById(serverId);
     }
+
+    public List<Long> getAllIds() {
+        return serverRepository.findAll().stream().map(Server::getId).toList();
+    }
 }

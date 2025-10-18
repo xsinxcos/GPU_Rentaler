@@ -4,7 +4,7 @@ import com.gpu.rentaler.common.DomainEvent;
 import com.gpu.rentaler.sys.model.Organization;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public record OrganizationDeleted(Organization organization) implements DomainEvent {
 }

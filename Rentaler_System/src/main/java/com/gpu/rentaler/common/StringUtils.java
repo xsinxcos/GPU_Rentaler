@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public class StringUtils {
 

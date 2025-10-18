@@ -6,6 +6,8 @@ import jakarta.annotation.Resource;
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
 import org.apache.commons.exec.PumpStreamHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -33,6 +35,7 @@ public class ServerInfoCollector {
     private static final boolean IS_WINDOWS = OS_NAME.contains("windows");
     private static final boolean IS_LINUX = OS_NAME.contains("linux");
     private static final boolean IS_MAC = OS_NAME.contains("mac");
+    private static final Logger log = LogManager.getLogger(ServerInfoCollector.class);
 
     @Resource
     private IPProperties ipProperties;
@@ -596,7 +599,7 @@ public class ServerInfoCollector {
             return outputStream.toString("UTF-8");
 
         } catch (Exception e) {
-            System.err.println("执行命令失败: " + command + " - " + e.getMessage());
+            log.info("执行命令失败: {} - {}", command, e.getMessage());
             return null;
         }
     }

@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public class LocalStorage implements Storage {
 

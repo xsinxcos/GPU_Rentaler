@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public record UserinfoDTO(String token, Long userId, String username, String avatar,
                           Credential credential, Set<String> permissions) implements Serializable {

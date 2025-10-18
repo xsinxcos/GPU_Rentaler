@@ -4,7 +4,7 @@ import com.gpu.rentaler.common.DomainEvent;
 import com.gpu.rentaler.sys.model.Resource;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public record ResourceDeleted(Resource resource) implements DomainEvent {
 }

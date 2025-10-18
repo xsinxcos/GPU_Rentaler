@@ -13,7 +13,7 @@ import static jakarta.persistence.FetchType.LAZY;
 /**
  * 用户
  *
- * @author cjbi
+ * @author wzq
  */
 @Entity
 public class User extends BaseEntity {

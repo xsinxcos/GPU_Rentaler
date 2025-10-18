@@ -24,7 +24,7 @@ import java.util.List;
 import static com.gpu.rentaler.sys.model.Organization.Type;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @SecurityRequirement(name = "bearerAuth")
 @RestController

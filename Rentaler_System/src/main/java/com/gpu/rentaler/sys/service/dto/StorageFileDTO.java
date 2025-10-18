@@ -5,7 +5,7 @@ import com.gpu.rentaler.sys.model.StorageFile;
 import java.time.LocalDateTime;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public class StorageFileDTO extends StorageFile {
 

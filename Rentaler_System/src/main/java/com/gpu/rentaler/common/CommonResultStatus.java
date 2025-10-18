@@ -1,7 +1,7 @@
 package com.gpu.rentaler.common;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public enum CommonResultStatus implements ResultStatus {
     OK(1000, "成功"),

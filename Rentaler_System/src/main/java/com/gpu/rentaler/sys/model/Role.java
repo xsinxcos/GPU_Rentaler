@@ -10,7 +10,7 @@ import static jakarta.persistence.CascadeType.DETACH;
 /**
  * 角色
  *
- * @author cjbi
+ * @author wzq
  */
 @Entity
 public class Role extends BaseEntity {

@@ -12,7 +12,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * 用户凭证
  *
- * @author cjbi
+ * @author wzq
  */
 @Entity
 public class UserCredential extends BaseEntity {

@@ -19,7 +19,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @RestController
 public class LoginController {

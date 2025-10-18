@@ -5,7 +5,7 @@ import com.gpu.rentaler.sys.model.Organization;
 import java.util.List;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public class OrgTreeDTO {
     private final Long id;

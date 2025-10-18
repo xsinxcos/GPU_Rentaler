@@ -19,7 +19,7 @@ import java.util.Map;
 /**
  * 解决jpa关联实体序列化的问题
  *
- * @author cjbi
+ * @author wzq
  * @date 2022/9/16
  */
 public class BaseEntitySerializer extends StdSerializer<BaseEntity> {

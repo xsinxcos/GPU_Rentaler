@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 import static com.gpu.rentaler.common.Constants.RESOURCE_ROOT_ID;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Service
 public class ResourceService {

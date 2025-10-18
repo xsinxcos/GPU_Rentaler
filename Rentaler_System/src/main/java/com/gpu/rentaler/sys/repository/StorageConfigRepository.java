@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Repository
 public interface StorageConfigRepository extends JpaRepository<StorageConfig, Long> {

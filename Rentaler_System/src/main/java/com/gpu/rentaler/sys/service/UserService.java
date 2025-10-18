@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import static com.gpu.rentaler.common.CommonResultStatus.RECORD_NOT_EXIST;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 @Service
 public class UserService {

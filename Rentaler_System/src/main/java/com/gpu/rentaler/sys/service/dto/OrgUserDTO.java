@@ -5,7 +5,7 @@ import com.gpu.rentaler.sys.model.User;
 import java.time.LocalDateTime;
 
 /**
- * @author cjbi
+ * @author wzq
  */
 public record OrgUserDTO(Long id,
                          String username,
