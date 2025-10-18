@@ -10,7 +10,7 @@ import java.util.Map;
  */
 
 @ConfigurationProperties("admin3")
-public class Admin3Properties {
+public class AdminProperties {
 
     private Map<String, Event> events = new HashMap<>();
 

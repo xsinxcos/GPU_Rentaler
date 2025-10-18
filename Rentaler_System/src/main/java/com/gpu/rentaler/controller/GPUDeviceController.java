@@ -112,7 +112,7 @@ public class GPUDeviceController {
                 StorageFile file = storageService.getByKey(key);
                 try {
                     List<String> devices = new ArrayList<>();
-                    devices.add(deviceId);
+                    devices.add(device.getRealDeviceId());
                     GPUTask task = gpuTaskService.initGPUTask(deviceId, userInfo.userId(), Instant.now(), deviceType.getHourlyRate(), TaskStatus.CREATING);
                     DContainerInfoResp infoResp = deviceTaskService.importAndUpDockerImage(
                         resource.getInputStream() ,file.getName() ,file.getSize(), device.getServerId(), devices);

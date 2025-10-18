@@ -1,7 +1,7 @@
 package com.gpu.rentaler.sys.service;
 
-import com.gpu.rentaler.Admin3Properties;
-import com.gpu.rentaler.Admin3Properties.Event;
+import com.gpu.rentaler.AdminProperties;
+import com.gpu.rentaler.AdminProperties.Event;
 import com.gpu.rentaler.common.CollectionUtils;
 import com.gpu.rentaler.common.JsonUtils;
 import com.gpu.rentaler.common.StringUtils;
@@ -25,9 +25,9 @@ public class LogService {
 
     private final StoredEventRepository storedEventRepository;
 
-    private final Admin3Properties admin3Properties;
+    private final AdminProperties admin3Properties;
 
-    public LogService(StoredEventRepository storedEventRepository, Admin3Properties admin3Properties) {
+    public LogService(StoredEventRepository storedEventRepository, AdminProperties admin3Properties) {
         this.storedEventRepository = storedEventRepository;
         this.admin3Properties = admin3Properties;
     }

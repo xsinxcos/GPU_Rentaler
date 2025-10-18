@@ -105,4 +105,8 @@ public class GPURealDevicesService {
     public GPURealDevices getByDeviceId(String deviceId) {
         return gpuRealDevicesRepository.findByRealDeviceId(deviceId);
     }
+
+    public void changeStatusByServerId(Long serverId, String status) {
+        gpuRealDevicesRepository.updateStatusByServerId(status ,serverId);
+    }
 }

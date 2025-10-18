@@ -1,6 +1,6 @@
 package com.gpu.rentaler.controller;
 
-import com.gpu.rentaler.Admin3Properties;
+import com.gpu.rentaler.AdminProperties;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,9 +19,9 @@ import java.util.List;
 @RequestMapping("/common")
 public class CommonController {
 
-    private final Admin3Properties admin3Properties;
+    private final AdminProperties admin3Properties;
 
-    public CommonController(Admin3Properties admin3Properties) {
+    public CommonController(AdminProperties admin3Properties) {
         this.admin3Properties = admin3Properties;
     }
 

@@ -45,28 +45,9 @@ public class GPUDeviceService {
         }
     }
 
-    public void changeStatusByServerId(Long serverId, String status) {
-        List<GPUDevice> devices = gpuDeviceRepository.findAllByServerId(serverId);
-        for (GPUDevice device : devices) {
-            device.setStatus(status);
-            gpuDeviceRepository.save(device);
-        }
-    }
-
     public GPUDevice getByDeviceId(String deviceId) {
         return gpuDeviceRepository.findByDeviceId(deviceId).getFirst();
     }
-
-
-    public Optional<GPUDevice> lease(String deviceId) {
-        GPUDevice device = getByDeviceId(deviceId);
-        return Optional.of(device);
-    }
-
-    public List<GPUDevice> getById(List<Long> ids) {
-        return gpuDeviceRepository.findAllById(ids);
-    }
-
     @Transactional
     public void deleteByDeviceId(String deviceId) {
         gpuDeviceRepository.deleteByDeviceId(deviceId);

@@ -31,7 +31,7 @@ public class OfflineCheckService {
         List<Long> deadServers = serverHeartBeatRecord.getDeadServersAndRemove();
         for (Long deadServer : deadServers) {
             serverService.changeStatus(deadServer, DeviceStatus.OFFLINE);
-            gpuDeviceService.changeStatusByServerId(deadServer, DeviceStatus.OFFLINE);
+            gpuRealDevicesService.changeStatusByServerId(deadServer, DeviceStatus.OFFLINE);
         }
     }
 

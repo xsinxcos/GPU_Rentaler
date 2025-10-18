@@ -17,12 +17,12 @@ public interface GPURealDevicesRepository extends JpaRepository<GPURealDevices, 
     @Query("select g from GPURealDevices g where g.serverId = ?1")
     List<GPURealDevices> findByServerId(Long serverId);
 
-    @Query("select g from GPURealDevices g where g.deviceId in ?1")
+    @Query("select g from GPURealDevices g where g.realDeviceId in ?1")
     List<GPURealDevices> findByDeviceIdIn(Collection<String> deviceIds);
 
     @Transactional
     @Modifying
-    @Query("update GPURealDevices g set g.isRentable = ?1 where g.deviceId in ?2")
+    @Query("update GPURealDevices g set g.isRentable = ?1 where g.realDeviceId in ?2")
     void updateIsRentableByDeviceIdIn(Boolean isRentable, Collection<String> deviceIds);
 
     @Query("select g from GPURealDevices g where g.serverId = ?1 and g.status = ?2")
@@ -39,4 +39,9 @@ public interface GPURealDevicesRepository extends JpaRepository<GPURealDevices, 
 
     @Query("select g from GPURealDevices g where g.realDeviceId = ?1")
     GPURealDevices findByRealDeviceId(String realDeviceId);
+
+    @Transactional
+    @Modifying
+    @Query("update GPURealDevices g set g.status = ?1 where g.serverId = ?2")
+    void updateStatusByServerId(String status, Long serverId);
 }

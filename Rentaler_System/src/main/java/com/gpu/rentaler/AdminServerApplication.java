@@ -5,13 +5,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
-@EnableConfigurationProperties(Admin3Properties.class)
+@EnableConfigurationProperties(AdminProperties.class)
 @SpringBootApplication
 @EnableScheduling // 启用定时任务
-public class Admin3ServerApplication {
+public class AdminServerApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Admin3ServerApplication.class, args);
+        SpringApplication.run(AdminServerApplication.class, args);
     }
 
 }
