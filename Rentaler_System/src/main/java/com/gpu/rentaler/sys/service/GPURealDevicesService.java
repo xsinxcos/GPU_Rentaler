@@ -84,14 +84,14 @@ public class GPURealDevicesService {
             .findByStatusAndIsRentable(DeviceStatus.ONLINE ,true)
             .stream()
             .map(GPURealDevices::getModel)
-            .toList();
+            .collect(Collectors.toList());
     }
 
     public List<String> findCantRentable() {
         return gpuRealDevicesRepository.findByStatusOrIsRentable(DeviceStatus.OFFLINE ,false)
             .stream()
             .map(GPURealDevices::getModel)
-            .toList();
+            .collect(Collectors.toList());
     }
 
     public Optional<GPURealDevices> lease(String model) {
