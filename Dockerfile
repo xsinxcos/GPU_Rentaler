@@ -11,7 +11,7 @@ COPY Rentaler_Monitor_Api ./Rentaler_Monitor_Api
 COPY Rentaler_System ./Rentaler_System
 
 # 构建 jar（跳过测试，加快速度）
-#RUN mvn clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # ---------- 运行阶段 ----------
 FROM eclipse-temurin:21-jre-alpine-3.22
