@@ -103,6 +103,8 @@ java -jar Rentaler_Device_Monitor-0.0.1-SNAPSHOT.jar
 ### 5. 访问与验证
 
 - 后端接口一般为 http://localhost:9090/（可根据配置文件端口调整）
+- 账号：admin 
+- 密码：123456 
 
 ### 6. 常见问题排查
 
