@@ -1,25 +1,15 @@
 spring:
+    profiles:
+        active: test  # 测试目录使用 test 配置文件
+        include: biz
     jpa:
-        generate-ddl: true
-        defer-datasource-initialization: true
-        show-sql: true
+        generate-ddl: true  # 自动生成DDL
+        defer-datasource-initialization: true  # 延迟数据源初始化
         hibernate:
-            ddl-auto: create-drop
-        properties:
-            hibernate.auto_quote_keyword: true
-    application:
-        name: admin3
+            ddl-auto: create-drop  # 测试时每次创建并销毁数据库表
+        show-sql: false  # 测试时不显示SQL
     sql:
         init:
+            mode: always  # 测试环境执行 data.sql，提供基础测试数据
             encoding: utf8
-            #      data-locations: classpath:data.sql
-            mode: always
-    data:
-        web:
-            pageable:
-                one-indexed-parameters: true
-    profiles:
-        include: biz
-server:
-    servlet:
-        context-path: /admin3
+            continue-on-error: false  # 测试环境遇到SQL错误应该停止
